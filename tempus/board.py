@@ -1,39 +1,40 @@
-"""The status board: pure rendering from the last statusList, so it's easy to test.
+"""The status board: a Discord "components v2" panel built from the last statusList, so it's easy to test.
 
-One embed for the headline, then one per region (busiest first). Discord allows 6000 characters across all
-embeds of a message, and a server card costs ~200 before its first player (two links), so not every server
-can have a card: every busy server gets a compact line, then the busiest servers are upgraded to full cards
-(map, tiers, Connect, player list) while there's room. At peaks the compact lines lose their Connect link,
-and if even that doesn't fit, the quietest servers become "+N more servers".
+One panel: a header, then a heading per region (busiest first), the busy servers as rows with a Join button,
+a short line for the region's quieter servers, and a menu that opens any server's full player list privately.
+
+Discord allows 40 components and 4000 characters of text per message. A server row with its button costs 3
+components, so about ten servers get a row; they go to the busiest servers first. Everything else is still
+listed, without names, in its region's "Also" line, and is in the details menu.
 
 Nothing in the text depends on the clock (map start times are Discord timestamps, rendered by each viewer),
 so the same data renders the same board and the cog can skip edits when nothing changed.
 """
 from __future__ import annotations
 
+import json
 import unicodedata
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 from urllib.parse import quote
 
 import discord
+from discord import ui
 
-from .regions import REGIONS
+from .regions import REGIONS, flag
 
 BOARD_COLOUR = discord.Colour(0x2E86C1)
 TITLE = "Tempus jump servers"
-FOOTER = "Last change"
 MAP_URL = "https://tempus2.xyz/maps/{}"
+SERVER_URL = "https://tempus2.xyz/servers/{}"
+SITE_URL = "https://tempus2.xyz"
+DETAILS_ID = "tempus:details"
 NAME_WIDTH = 18
 RANK_WIDTH = 7
-SHORT_CAP = 4  # player lines on a card when the full list doesn't fit
-FIELD_LIMIT = 1024
-FIELD_NAME_LIMIT = 256
-MAX_FIELDS = 25
-MAX_EMBEDS = 10
-MESSAGE_LIMIT = 6000
-# room left for the footer, the "+N more servers" line and rounding; sizes are counted in UTF-16 units as Discord does
-BUDGET = 5850
-CONTINUATION = "​"
+MAX_COMPONENTS = 40
+MAX_TEXT = 4000
+TEXT_BUDGET = 3900  # room for the footer's timestamp and rounding
+MAX_OPTIONS = 25
+NAMES_CHARS = 90  # roughly one line of names under a server row
 
 Tiers = Tuple[Optional[int], Optional[int]]
 
@@ -41,14 +42,6 @@ Tiers = Tuple[Optional[int], Optional[int]]
 def units(text: Optional[str]) -> int:
     """Length as Discord counts it (UTF-16 code units: an emoji counts twice)."""
     return len((text or "").encode("utf-16-le")) // 2
-
-
-def embeds_size(embeds: Sequence[discord.Embed]) -> int:
-    total = 0
-    for e in embeds:
-        total += units(e.title) + units(e.description) + units(e.footer.text if e.footer else None)
-        total += sum(units(f.name) + units(f.value) for f in e.fields)
-    return total
 
 
 def plural(n: int, word: str) -> str:
@@ -93,22 +86,26 @@ def tier_text(tiers: Optional[Tiers]) -> str:
     return " / ".join(f"T{t} {cls}" for t, cls in zip(tiers, ("S", "D")) if t)
 
 
-def connect_text(s: Dict[str, Any], connect_url: Optional[str]) -> str:
-    # the connect page only accepts ip:port, so a server without an IP gets the console command instead
-    port = s.get("port")
-    if not port:
-        return ""
-    if s.get("ip") and connect_url:
-        addr = f"{s['ip']}:{port}"
-        return f"[Connect]({connect_url.format(addr=addr)})"
+def connect_url_for(s: Dict[str, Any], connect_url: Optional[str]) -> Optional[str]:
+    # the connect page only accepts ip:port
+    if s.get("ip") and s.get("port") and connect_url:
+        return connect_url.format(addr=f"{s['ip']}:{s['port']}")
+    return None
+
+
+def connect_command(s: Dict[str, Any]) -> Optional[str]:
     host = s.get("ip") or s.get("host")
-    return inline_code(f"connect {host}:{port}") if host else ""
+    return inline_code(f"connect {host}:{s['port']}") if host and s.get("port") else None
+
+
+def map_url(name: str) -> str:
+    return MAP_URL.format(quote(name, safe=""))
 
 
 def map_link(name: Optional[str]) -> str:
     if not name:
         return inline_code(None)
-    return f"[{esc(name)}]({MAP_URL.format(quote(name, safe=''))})"
+    return f"[{esc(name)}]({map_url(name)})"
 
 
 def sort_users(users: Sequence[Dict[str, Any]], ranks: Dict[int, Optional[int]]) -> List[Dict[str, Any]]:
@@ -119,72 +116,35 @@ def sort_users(users: Sequence[Dict[str, Any]], ranks: Dict[int, Optional[int]])
     return sorted(users, key=key)
 
 
-def player_lines(users: Sequence[Dict[str, Any]], ranks: Dict[int, Optional[int]], max_lines: int, players: int) -> List[str]:
-    shown = sort_users(users, ranks)[:max_lines]
+def player_lines(users: Sequence[Dict[str, Any]], ranks: Dict[int, Optional[int]], players: int) -> List[str]:
+    """Code block lines: name and overall rank, columns aligned even with wide characters."""
+    shown = sort_users(users, ranks)
     lines = []
     for u in shown:
         r = ranks.get(u["id"])
-        name = display_name(u["name"]) or "(unnamed)"
-        lines.append(f"{fit(name, NAME_WIDTH)} {('#' + str(r)) if r else '':>{RANK_WIDTH}}")
+        lines.append(f"{fit(display_name(u['name']) or '(unnamed)', NAME_WIDTH)} {('#' + str(r)) if r else '':>{RANK_WIDTH}}")
     if players > len(shown):
         lines.append(f"+{players - len(shown)} more")
     return lines
 
 
-def server_title(s: Dict[str, Any]) -> str:
-    return esc(f"{s['shortname']} · {s['name']}"[:200])[:FIELD_NAME_LIMIT]
-
-
-def card(s: Dict[str, Any], ranks: Dict[int, Optional[int]], tiers: Dict[str, Tiers], connect_url: Optional[str], max_lines: int) -> Tuple[str, str]:
-    """A full server card: (field name, field value)."""
-    first = [map_link(s.get("map"))]
-    t = tier_text(tiers.get(s.get("map") or ""))
-    if t:
-        first.append(t)
-    if s.get("map_since"):
-        first.append(f"started <t:{int(s['map_since'])}:R>")
-    second = [f"{s['players']}/{s.get('max_players') or '?'}"]
-    c = connect_text(s, connect_url)
-    if c:
-        second.append(c)
-    value = " · ".join(first) + "\n" + " · ".join(second)
-    lines = player_lines(s["users"], ranks, max_lines, s["players"])
-    if lines:
-        value += "\n```\n" + "\n".join(lines) + "\n```"
-    return server_title(s), value
-
-
-def compact_line(s: Dict[str, Any], tiers: Dict[str, Tiers], connect_url: Optional[str], with_connect: bool) -> str:
-    parts = [f"**{esc(s['shortname'])}** {s['players']}/{s.get('max_players') or '?'}", inline_code(s.get("map"))]
-    t = tier_text(tiers.get(s.get("map") or ""))
-    if t:
-        parts.append(t)
-    c = connect_text(s, connect_url) if with_connect else ""
-    if c:
-        parts.append(c)
+def names_line(s: Dict[str, Any], ranks: Dict[int, Optional[int]], budget: int = NAMES_CHARS) -> str:
+    """"sgt Bytheway #50 · Fluffie #60 · +2 more": best-ranked players first, as many as fit on about one line."""
+    parts: List[str] = []
+    used = 0
+    users = sort_users(s["users"], ranks)
+    for u in users:
+        name = esc((u["name"] or "(unnamed)")[:24])
+        r = ranks.get(u["id"])
+        part = f"{name} #{r}" if r else name
+        if parts and used + len(part) + 3 > budget:
+            break
+        parts.append(part)
+        used += len(part) + 3
+    rest = s["players"] - len(parts)
+    if rest > 0:
+        parts.append(f"+{rest} more")
     return " · ".join(parts)
-
-
-def _chunks(lines: Sequence[str], limit: int = FIELD_LIMIT) -> List[str]:
-    chunks: List[str] = []
-    current = ""
-    for line in lines:
-        if current and units(current) + 1 + units(line) > limit:
-            chunks.append(current)
-            current = ""
-        current = f"{current}\n{line}" if current else line
-    if current:
-        chunks.append(current)
-    return chunks
-
-
-def headline(busy: Sequence[Dict[str, Any]], empty: int, region: Optional[str]) -> str:
-    where = f" in {region}" if region else ""
-    if not busy:
-        return f"Nobody is playing on Tempus{where} right now."
-    players = sum(s["players"] for s in busy)
-    text = f"{plural(players, 'player')} on {plural(len(busy), 'server')}{where} right now"
-    return text + (f" ({empty} empty)" if empty else "")
 
 
 def region_order(busy: Sequence[Dict[str, Any]]) -> List[str]:
@@ -195,89 +155,186 @@ def region_order(busy: Sequence[Dict[str, Any]]) -> List[str]:
     return sorted(totals, key=lambda r: (-totals[r], known.get(r, len(known)), r))
 
 
+def row_text(s: Dict[str, Any], ranks: Dict[int, Optional[int]], tiers: Dict[str, Tiers]) -> str:
+    first = [f"{flag(s.get('country'))} **{esc(s['shortname'])}**", map_link(s.get("map"))]
+    t = tier_text(tiers.get(s.get("map") or ""))
+    if t:
+        first.append(t)
+    first.append(f"**{s['players']}**/{s.get('max_players') or '?'}")
+    lines = [" · ".join(first)]
+    names = names_line(s, ranks)
+    if names:
+        lines.append(names)
+    sub = esc(s["name"])
+    if s.get("map_since"):
+        sub += f" · map started <t:{int(s['map_since'])}:R>"
+    lines.append(f"-# {sub}")
+    return "\n".join(lines)
+
+
+def row_button(s: Dict[str, Any], connect_url: Optional[str]) -> ui.Button:
+    url = connect_url_for(s, connect_url)
+    if url:
+        return ui.Button(label="Join", url=url, style=discord.ButtonStyle.link)
+    return ui.Button(label="Info", url=SERVER_URL.format(s["id"]), style=discord.ButtonStyle.link)
+
+
+def also_line(servers: Sequence[Dict[str, Any]], budget: int) -> str:
+    """The quieter servers of a region on one subtext line, cut short with "+N more" if it gets long."""
+    parts: List[str] = []
+    used = 0
+    for i, s in enumerate(servers):
+        part = f"{esc(s['shortname'])} {esc(s.get('map') or '?')} {s['players']}/{s.get('max_players') or '?'}"
+        if parts and used + len(part) + 3 > budget:
+            parts.append(f"+{len(servers) - i} more")
+            break
+        parts.append(part)
+        used += len(part) + 3
+    return "-# Also: " + " · ".join(parts)
+
+
+def header_text(title: str, busy: Sequence[Dict[str, Any]], empty: int, region: Optional[str], usual: Optional[Tuple[int, str]], stale_since: Optional[float]) -> str:
+    where = f" in {region}" if region else ""
+    lines = [f"## {title}"]
+    if busy:
+        players = sum(s["players"] for s in busy)
+        lines.append(f"**{plural(players, 'player')}** on **{plural(len(busy), 'server')}**{where} right now" + (f" · {empty} empty" if empty else ""))
+    else:
+        lines.append(f"Nobody is playing on Tempus{where} right now.")
+    if usual:
+        lines.append(f"-# Usually around {plural(usual[0], 'player')}{where} at this time on {usual[1]} (UTC)")
+    if stale_since:
+        lines.append(f"⚠️ No answer from Tempus since <t:{int(stale_since)}:R>, so this is the last data it sent.")
+    return "\n".join(lines)
+
+
+def footer_text(changed_at: Optional[float]) -> str:
+    when = f"Last change <t:{int(changed_at)}:R> · " if changed_at else ""
+    return f"-# {when}Data from [tempus2.xyz]({SITE_URL}) · Pick a server below for its players and Connect"
+
+
+class Board(ui.LayoutView):
+    """The panel, with a handle on the footer so the cog can stamp the time of the last change after comparing."""
+
+    def __init__(self, timeout: Optional[float]) -> None:
+        super().__init__(timeout=timeout)
+        self.footer: Optional[ui.TextDisplay] = None
+
+    def signature(self) -> str:
+        """Everything but the footer's timestamp: equal signatures mean nothing to edit."""
+        saved = self.footer.content if self.footer else None
+        if self.footer:
+            self.footer.content = ""
+        try:
+            return json.dumps(self.to_components(), sort_keys=True, ensure_ascii=False)
+        finally:
+            if self.footer:
+                self.footer.content = saved or ""
+
+
+def details_options(busy: Sequence[Dict[str, Any]]) -> List[discord.SelectOption]:
+    return [discord.SelectOption(label=f"{s['shortname']} · {s.get('map') or '?'}"[:100], value=str(s["id"]), emoji=flag(s.get("country")),
+                                 description=f"{s['players']}/{s.get('max_players') or '?'} · {s['name']}"[:100]) for s in busy[:MAX_OPTIONS]]
+
+
 def render_board(servers: Sequence[Dict[str, Any]], ranks: Dict[int, Optional[int]], tiers: Dict[str, Tiers], connect_url: Optional[str] = None,
                  usual: Optional[Tuple[int, str]] = None, region: Optional[str] = None, stale_since: Optional[float] = None,
-                 max_lines: int = 8) -> List[discord.Embed]:
-    """usual: (players, "Fridays") usually online at this day and hour (UTC), from history.usual()."""
+                 timeout: Optional[float] = None) -> Board:
+    """usual: (players, "Fridays") usually online at this day and hour (UTC), from history.usual(). Needs a running event loop."""
     online = [s for s in servers if s.get("online") and (region is None or s["region"] == region)]
     busy = [s for s in online if s["players"] > 0]
     order = region_order(busy)
-    # busiest server first; on a tie the busier region's server, so the regions shown first get the cards
+    # busiest server first; on a tie the busier region's server, so the regions shown first get the rows
     busy.sort(key=lambda s: (-s["players"], order.index(s["region"]), s["shortname"]))
-    empty = len(online) - len(busy)
-    where = f" in {region}" if region else ""
-
-    def description(dropped: int) -> str:
-        lines = [headline(busy, empty, region)]
-        if usual:
-            lines.append(f"Usually around {plural(usual[0], 'player')}{where} at this time on {usual[1]} (UTC)")
-        if stale_since:
-            lines.append(f"⚠️ No answer from Tempus since <t:{int(stale_since)}:R>, so this is the last data it sent.")
-        if dropped:
-            lines.append(f"+{plural(dropped, 'more server')}")
-        return "\n".join(lines)
-
     title = f"{TITLE} · {region}" if region else TITLE
-    by_region: Dict[str, List[Dict[str, Any]]] = {r: [s for s in busy if s["region"] == r] for r in order}
-    region_titles = {r: f"{r} · {plural(sum(s['players'] for s in v), 'player')} on {plural(len(v), 'server')}" for r, v in by_region.items()}
-    fixed = units(title) + units(description(999)) + units(FOOTER) + sum(units(t) for t in region_titles.values())
-    # each region's compact list has a field name ("+12 quieter servers")
-    fixed += 24 * len(order)
+    header = header_text(title, busy, len(online) - len(busy), region, usual, stale_since)
+    footer = footer_text(0)  # same length as with a real timestamp, near enough
+    rows: Dict[int, str] = {}
 
-    def compact_lines(with_connect: bool) -> Dict[int, str]:
-        return {s["id"]: compact_line(s, tiers, connect_url, with_connect) for s in busy}
+    def layout(with_rows: Dict[int, str]) -> Tuple[int, int, Dict[str, str]]:
+        """(components, text units, region -> its "Also" line) for a set of rows."""
+        components = 4 + (2 if busy else 0)  # container, header, separator, footer; the menu's row and select
+        text = units(header) + units(footer)
+        also: Dict[str, str] = {}
+        for r in order:
+            here = [s for s in busy if s["region"] == r]
+            rest = [s for s in here if s["id"] not in with_rows]
+            heading = region_heading(r, here)
+            components += 1
+            text += units(heading)
+            for s in here:
+                if s["id"] in with_rows:
+                    components += 3
+                    text += units(with_rows[s["id"]])
+            if rest:
+                also[r] = also_line(rest, 400)
+                text += units(also[r]) + 1
+                components += 1 if len(rest) < len(here) else 0  # without rows it shares the heading's text
+        return components, text, also
 
-    compact = compact_lines(True)
-    cost = fixed + sum(units(line) + 1 for line in compact.values())
-    if cost > BUDGET:
-        compact = compact_lines(False)
-        cost = fixed + sum(units(line) + 1 for line in compact.values())
-    shown = list(busy)
-    dropped = 0
-    while cost > BUDGET and shown:
-        s = shown.pop()  # busy is busiest first, so this is the quietest left
-        cost -= units(compact[s["id"]]) + 1
-        dropped += 1
+    for s in busy:
+        trial = dict(rows)
+        trial[s["id"]] = row_text(s, ranks, tiers)
+        components, text, _ = layout(trial)
+        if components <= MAX_COMPONENTS and text <= TEXT_BUDGET:
+            rows = trial
+    _, text, also = layout(rows)
+    if text > TEXT_BUDGET:  # only with very many busy servers: shorten the "Also" lines
+        share = max(60, (TEXT_BUDGET - (text - sum(units(a) for a in also.values()))) // max(1, len(also)))
+        also = {r: also_line([s for s in busy if s["region"] == r and s["id"] not in rows], share) for r in also}
 
-    full: Dict[int, Tuple[str, str]] = {}
-    for s in shown:
-        for cap in dict.fromkeys((max_lines, min(SHORT_CAP, max_lines))):
-            name, value = card(s, ranks, tiers, connect_url, cap)
-            extra = units(name) + units(value) - units(compact[s["id"]]) - 1
-            if cost + extra <= BUDGET:
-                full[s["id"]] = (name, value)
-                cost += extra
-                break
-
-    embeds = [discord.Embed(title=title, description=description(dropped), colour=BOARD_COLOUR)]
-    shown_ids = {s["id"] for s in shown}
+    board = Board(timeout=timeout)
+    panel = ui.Container(accent_colour=BOARD_COLOUR)
+    panel.add_item(ui.TextDisplay(header))
+    # one rule under the header; the region headings separate the rest, and every component counts
+    panel.add_item(ui.Separator())
     for r in order:
-        servers_here = [s for s in by_region[r] if s["id"] in shown_ids]
-        if not servers_here:
+        here = [s for s in busy if s["region"] == r]
+        heading = region_heading(r, here)
+        with_rows = [s for s in here if s["id"] in rows]
+        if not with_rows:
+            panel.add_item(ui.TextDisplay(f"{heading}\n{also[r]}" if r in also else heading))
             continue
-        cards = [s for s in servers_here if s["id"] in full]
-        while True:
-            rest = [s for s in servers_here if s["id"] not in {c["id"] for c in cards}]
-            chunks = _chunks([compact[s["id"]] for s in rest])
-            if len(cards) + len(chunks) <= MAX_FIELDS or not cards:
-                break
-            cards.pop()  # too many fields: the quietest card goes back to a compact line
-        e = discord.Embed(title=region_titles[r], colour=BOARD_COLOUR)
-        for s in cards:
-            name, value = full[s["id"]]
-            e.add_field(name=name, value=value, inline=False)
-        for i, chunk in enumerate(chunks):
-            label = f"+{plural(len(rest), 'quieter server')}" if cards else plural(len(rest), "server")
-            e.add_field(name=label if i == 0 else CONTINUATION, value=chunk, inline=False)
-        embeds.append(e)
-    return _enforce_limits(embeds[:MAX_EMBEDS])
+        panel.add_item(ui.TextDisplay(heading))
+        for s in with_rows:
+            panel.add_item(ui.Section(ui.TextDisplay(rows[s["id"]]), accessory=row_button(s, connect_url)))
+        if r in also:
+            panel.add_item(ui.TextDisplay(also[r]))
+    board.footer = ui.TextDisplay(footer_text(None))
+    panel.add_item(board.footer)
+    board.add_item(panel)
+    if busy:
+        board.add_item(ui.ActionRow(ui.Select(custom_id=DETAILS_ID, placeholder="Players and Connect for any server…", options=details_options(busy))))
+    return board
 
 
-def _enforce_limits(embeds: List[discord.Embed]) -> List[discord.Embed]:
-    """Last line of defence: the budget above should already keep the board inside Discord's limits."""
-    while embeds_size(embeds) + units(FOOTER) > MESSAGE_LIMIT:
-        last = next((e for e in reversed(embeds) if e.fields), None)
-        if last is None:
-            break
-        last.remove_field(len(last.fields) - 1)
-    return [e for i, e in enumerate(embeds) if i == 0 or e.fields]
+def region_heading(region: str, servers: Sequence[Dict[str, Any]]) -> str:
+    return f"### {region} · {plural(sum(s['players'] for s in servers), 'player')} on {plural(len(servers), 'server')}"
+
+
+def render_details(s: Dict[str, Any], ranks: Dict[int, Optional[int]], tiers: Dict[str, Tiers], connect_url: Optional[str] = None) -> ui.LayoutView:
+    """One server in full, for the person who picked it in the menu."""
+    view = ui.LayoutView(timeout=None)
+    panel = ui.Container(accent_colour=BOARD_COLOUR)
+    first = [map_link(s.get("map"))]
+    t = tier_text(tiers.get(s.get("map") or ""))
+    if t:
+        first.append(t)
+    first.append(f"**{s['players']}**/{s.get('max_players') or '?'} players")
+    text = f"### {flag(s.get('country'))} {esc(s['shortname'])} · {esc(s['name'])}\n" + " · ".join(first)
+    if s.get("map_since"):
+        text += f"\n-# Map started <t:{int(s['map_since'])}:R>"
+    panel.add_item(ui.TextDisplay(text))
+    lines = player_lines(s["users"], ranks, s["players"])
+    if lines:
+        panel.add_item(ui.TextDisplay("```\n" + "\n".join(lines) + "\n```"))
+    url = connect_url_for(s, connect_url)
+    if not url and connect_command(s):
+        panel.add_item(ui.TextDisplay(f"Join from the TF2 console: {connect_command(s)}"))
+    buttons = [ui.Button(label="Join", url=url, style=discord.ButtonStyle.link)] if url else []
+    if s.get("map"):
+        buttons.append(ui.Button(label="Map on Tempus", url=map_url(s["map"]), style=discord.ButtonStyle.link))
+    buttons.append(ui.Button(label="Server on Tempus", url=SERVER_URL.format(s["id"]), style=discord.ButtonStyle.link))
+    panel.add_item(ui.ActionRow(*buttons))
+    view.add_item(panel)
+    return view

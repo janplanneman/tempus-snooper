@@ -1,22 +1,20 @@
 from __future__ import annotations
 
-import json
 import logging
 import socket
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from . import history, records
-from .board import BOARD_COLOUR, FOOTER, connect_text, esc, map_link, plural, render_board
+from .board import BOARD_COLOUR, DETAILS_ID, Board, connect_command, connect_url_for, esc, footer_text, map_link, plural, render_board, render_details
 from .config import Config
 from .ranks import RankService
 from .regions import REGIONS
 from .storage import Storage
-from .tempus_client import TempusClient
+from .tempus_client import NotFound, TempusClient
 from .tracker import Tracker, now
 
 log = logging.getLogger(__name__)
@@ -24,6 +22,12 @@ log = logging.getLogger(__name__)
 REGION_CHOICES = [app_commands.Choice(name=r, value=r) for r in REGIONS]
 WHERE_MAX = 20
 SEEN_RECORDS_KEEP_S = 30 * 86400
+# the board's message format; a board in an older format is replaced by a new message, since Discord can't edit
+# an embed message into a components v2 one
+BOARD_FORMAT = "2"
+# leaderboard lookups for WR posts per activity check; the rest are posted without "what it beat"
+MAX_WR_LOOKUPS = 10
+EPHEMERAL_VIEW_TIMEOUT = 600
 
 
 def _ts(t: Optional[float], style: str = "R") -> str:
@@ -49,10 +53,6 @@ def list_messages(title: str, lines: List[str]) -> List[List[discord.Embed]]:
         size += len(chunk) + len(embed.title or "")
     messages.append(batch)
     return messages
-
-
-def signature(embeds: Sequence[discord.Embed]) -> str:
-    return json.dumps([e.to_dict() for e in embeds], sort_keys=True, ensure_ascii=False)
 
 
 class ServersCog(commands.Cog):
@@ -90,14 +90,14 @@ class ServersCog(commands.Cog):
     def _ok(self, guild: discord.Guild, what: str) -> None:
         self._warned = {k for k in self._warned if not k.startswith(f"{guild.id}:{what}:")}
 
-    async def build_board(self, region: Optional[str] = None) -> Optional[List[discord.Embed]]:
+    async def build_board(self, region: Optional[str] = None, timeout: Optional[float] = None) -> Optional[Board]:
         """None until the first statusList has arrived."""
         if self.tracker.updated_at is None:
             return None
         servers = self.tracker.servers
         ranks = self.ranks.known(u["id"] for s in servers for u in s["users"])
         return render_board(servers, ranks, self.tracker.tiers, connect_url=self.cfg.connect_url, usual=await self._usual_now(region), region=region,
-                            stale_since=self.tracker.stale_since(), max_lines=self.cfg.max_player_lines)
+                            stale_since=self.tracker.stale_since(), timeout=timeout)
 
     async def _record_history(self) -> None:
         """A history snapshot every SNAPSHOT_INTERVAL_MINUTES: players online and the servers they're on."""
@@ -129,12 +129,12 @@ class ServersCog(commands.Cog):
     async def _board_state(self, guild: discord.Guild) -> Dict[str, Optional[int]]:
         if guild.id not in self._boards:
             saved = await self.store.kv_get(f"status_board:{guild.id}") or ""
-            ch, _, msg = saved.partition(":")
-            self._boards[guild.id] = {"channel_id": int(ch) if ch.isdigit() else None, "msg_id": int(msg) if msg.isdigit() else None}
+            ch, msg, fmt = (saved.split(":") + ["", "", ""])[:3]
+            self._boards[guild.id] = {"channel_id": int(ch) if ch.isdigit() else None, "msg_id": int(msg) if msg.isdigit() else None, "format": fmt or None}
         return self._boards[guild.id]
 
-    async def _save_board(self, guild: discord.Guild, state: Dict[str, Optional[int]]) -> None:
-        await self.store.kv_set(f"status_board:{guild.id}", f"{state['channel_id'] or ''}:{state['msg_id'] or ''}")
+    async def _save_board(self, guild: discord.Guild, state: Dict[str, Any]) -> None:
+        await self.store.kv_set(f"status_board:{guild.id}", f"{state['channel_id'] or ''}:{state['msg_id'] or ''}:{state.get('format') or ''}")
 
     async def _board_channel(self, guild: discord.Guild, state: Dict[str, Optional[int]]) -> Optional[discord.TextChannel]:
         if self.cfg.status_channel_id:
@@ -173,32 +173,43 @@ class ServersCog(commands.Cog):
             log.exception("Could not record a history snapshot")
         if not self.bot.is_ready():
             return
-        embeds = await self.build_board()
-        if embeds is None:
+        board = await self.build_board()
+        if board is None:
             return
-        sig = signature(embeds)
+        sig = board.signature()
         if sig != self._signature:
             self._signature, self._changed_at = sig, now()
-        # the timestamp is the last real change, so an unchanged board needs no edit
-        embeds[-1].set_footer(text=FOOTER)
-        embeds[-1].timestamp = datetime.fromtimestamp(self._changed_at, tz=timezone.utc)
-        for guild in list(self.bot.guilds):
+        for i, guild in enumerate(list(self.bot.guilds)):
             try:
-                await self._update_guild_board(guild, embeds, sig)
+                # a fresh panel per message: discord.py keeps one view object per message for the details menu
+                guild_board = board if i == 0 else await self.build_board()
+                if guild_board is None:
+                    continue
+                # the time is the last real change, so an unchanged board needs no edit
+                if guild_board.footer is not None:
+                    guild_board.footer.content = footer_text(self._changed_at)
+                await self._update_guild_board(guild, guild_board, sig)
             except Exception:
                 log.exception("Status board update failed in %s", guild.name)
 
-    async def _update_guild_board(self, guild: discord.Guild, embeds: List[discord.Embed], sig: str) -> None:
+    async def _update_guild_board(self, guild: discord.Guild, board: Board, sig: str) -> None:
         # every server with a #tempus-status channel gets its own board; missing perms are retried every update
         state = await self._board_state(guild)
         channel = await self._board_channel(guild, state)
         if channel is None or self._missing_perms(guild, channel, "board"):
             return
+        if state["msg_id"] and state.get("format") != BOARD_FORMAT:
+            try:
+                await channel.get_partial_message(state["msg_id"]).delete()
+            except discord.HTTPException as e:
+                log.info("Could not delete the old-format status board in %s: %s", guild.name, e)
+            log.info("Replacing the old-format status board in %s", guild.name)
+            state["msg_id"] = None
         if state["msg_id"]:
             if self._sent.get(guild.id) == sig:
                 return
             try:
-                await channel.get_partial_message(state["msg_id"]).edit(embeds=embeds)
+                await channel.get_partial_message(state["msg_id"]).edit(view=board)
                 self._sent[guild.id] = sig
                 self._ok(guild, "board")
                 return
@@ -209,11 +220,12 @@ class ServersCog(commands.Cog):
                 self._warn_once(f"{guild.id}:board:edit", "Could not edit the status board in %s: %s; will keep retrying", guild.name, e)
                 return
         try:
-            msg = await channel.send(embeds=embeds)
+            msg = await channel.send(view=board)
         except discord.HTTPException as e:
             self._warn_once(f"{guild.id}:board:send", "Could not post the status board in %s: %s; will keep retrying", guild.name, e)
             return
         state["msg_id"] = msg.id
+        state["format"] = BOARD_FORMAT
         self._sent[guild.id] = sig
         await self._save_board(guild, state)
         self._ok(guild, "board")
@@ -224,8 +236,9 @@ class ServersCog(commands.Cog):
         t = now()
         seen = await self.store.seen_record_ids()
         if not await self.store.kv_get("records_primed"):
-            # first run: what's in the feed now is old news
+            # first run: what's in the feed now is old news, but its WRs are what the next WRs will beat
             await self.store.mark_records_seen(((r["id"], r["kind"]) for r in entries), t)
+            await self.store.save_wrs(records.wr_memory_rows(entries))
             await self.store.kv_set("records_primed", str(t))
             log.info("Records feed started; %d records already in the feed won't be posted", len(entries))
             return
@@ -235,39 +248,76 @@ class ServersCog(commands.Cog):
         if t - self._last_records_prune > 86400:
             self._last_records_prune = t
             await self.store.prune_seen_records(t - SEEN_RECORDS_KEEP_S)
-        if not fresh or not self.bot.is_ready():
+        embeds = await self._record_embeds(fresh) if fresh and self.bot.is_ready() else []
+        # after the posts have used the old WRs
+        await self.store.save_wrs(records.wr_memory_rows(entries))
+        if not embeds:
             return
-        names = {s["id"]: s["shortname"] for s in self.tracker.servers}
-        lines = [records.record_line(r, self.tracker.tiers, names) for r in fresh]
-        log.info("Posting %d new records", len(lines))
+        log.info("Posting %d new records", len(embeds))
         for guild in list(self.bot.guilds):
             try:
-                await self._post_records(guild, lines)
+                await self._post_records(guild, embeds)
             except Exception:
                 log.exception("Could not post records in %s", guild.name)
 
-    async def _post_records(self, guild: discord.Guild, lines: List[str]) -> None:
+    async def _record_embeds(self, fresh: List[Dict[str, Any]]) -> List[discord.Embed]:
+        names = {s["id"]: s["shortname"] for s in self.tracker.servers}
+        embeds = []
+        lookups = 0
+        for r in fresh:
+            previous: Optional[Dict[str, Any]] = None
+            context: Dict[str, Any] = {}
+            if r["kind"] in records.WR_KINDS and r.get("zone_id") and r.get("class"):
+                previous = await self.store.get_wr(r["zone_id"], r["class"])
+                if lookups < MAX_WR_LOOKUPS:
+                    lookups += 1
+                    try:
+                        context = records.leaderboard_context(await self.client.get(f"zones/id/{r['zone_id']}/records/list?limit=3"), r["class"])
+                    except NotFound:
+                        pass
+                    except Exception as e:
+                        log.warning("Could not read the leaderboard of zone %s: %s", r["zone_id"], e)
+                # two WRs on one zone in the same check: the second beats the first
+                await self.store.save_wrs(records.wr_memory_rows([r]))
+            embeds.append(records.record_embed(r, self.tracker.tiers, names, previous, context))
+        return embeds
+
+    async def _post_records(self, guild: discord.Guild, embeds: List[discord.Embed]) -> None:
         channel = discord.utils.get(guild.text_channels, name=self.cfg.records_channel_name)
         if channel is None or self._missing_perms(guild, channel, "records"):
             return
-        title = "New Tempus record" if len(lines) == 1 else f"{len(lines)} new Tempus records"
-        for embeds in list_messages(title, lines):
+        # up to 10 embeds per message; a record embed is a few hundred characters, far below the 6000 limit
+        for i in range(0, len(embeds), 10):
             try:
-                await channel.send(embeds=embeds)
+                await channel.send(embeds=embeds[i:i + 10])
             except discord.HTTPException as e:
                 self._warn_once(f"{guild.id}:records:send", "Could not post records in %s: %s", guild.name, e)
                 return
         self._ok(guild, "records")
 
+    @commands.Cog.listener()
+    async def on_interaction(self, interaction: discord.Interaction) -> None:
+        """The board's "players and Connect" menu. Handled by its id, so menus on boards posted before a restart work too."""
+        data = interaction.data or {}
+        if interaction.type != discord.InteractionType.component or data.get("custom_id") != DETAILS_ID:
+            return
+        values = data.get("values") or []
+        s = next((s for s in self.tracker.servers if values and str(s["id"]) == values[0]), None)
+        if s is None or not s["online"]:
+            await interaction.response.send_message("That server isn't online any more.", ephemeral=True)
+            return
+        ranks = self.ranks.known(u["id"] for u in s["users"])
+        await interaction.response.send_message(view=render_details(s, ranks, self.tracker.tiers, self.cfg.connect_url), ephemeral=True)
+
     @app_commands.command(name="servers", description="Who is playing on Tempus jump servers right now")
-    @app_commands.describe(region="Only this region, with more room for player lists")
+    @app_commands.describe(region="Only this region, with room for more servers")
     @app_commands.choices(region=REGION_CHOICES)
     async def servers(self, interaction: discord.Interaction, region: Optional[app_commands.Choice[str]] = None) -> None:
-        embeds = await self.build_board(region.value if region else None)
-        if embeds is None:
+        board = await self.build_board(region.value if region else None, timeout=EPHEMERAL_VIEW_TIMEOUT)
+        if board is None:
             await interaction.response.send_message("Still waiting for the first reply from Tempus; try again in a minute.", ephemeral=True)
             return
-        await interaction.response.send_message(embeds=embeds, ephemeral=True)
+        await interaction.response.send_message(view=board, ephemeral=True)
 
     @app_commands.command(name="where", description="Which Tempus server a player is on right now")
     @app_commands.describe(player="Part of the player's name")
@@ -289,7 +339,8 @@ class ServersCog(commands.Cog):
         for u, s in found[:WHERE_MAX]:
             rank = f" (#{ranks[u['id']]})" if ranks.get(u["id"]) else ""
             parts = [f"**{esc(u['name'] or '(unnamed)')}**{rank}", f"**{esc(s['shortname'])}** {esc(s['name'])}", map_link(s.get("map"))]
-            c = connect_text(s, self.cfg.connect_url)
+            url = connect_url_for(s, self.cfg.connect_url)
+            c = f"[Connect]({url})" if url else connect_command(s)
             if c:
                 parts.append(c)
             lines.append(" · ".join(parts))

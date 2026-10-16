@@ -77,7 +77,6 @@ class Config:
     rank_lookup_interval_s: float = 2.0
     request_interval_s: float = 1.0
     request_timeout_s: float = 20.0
-    max_player_lines: int = 8
 
     # history snapshots (players online over time)
     snapshot_interval_s: int = 300
@@ -113,7 +112,6 @@ def load_config(env_file: Optional[str] = None) -> Config:
         rank_lookup_interval_s=_float("RANK_LOOKUP_SECONDS", 2.0),
         request_interval_s=_float("REQUEST_INTERVAL_SECONDS", 1.0),
         request_timeout_s=_float("REQUEST_TIMEOUT_SECONDS", 20.0),
-        max_player_lines=_int("MAX_PLAYER_LINES", 8),
         snapshot_interval_s=_int("SNAPSHOT_INTERVAL_MINUTES", 5) * 60,
         history_keep_days=_int("HISTORY_KEEP_DAYS", 120),
         db_path=_str("DB_PATH", "tempus.db"),
@@ -126,8 +124,6 @@ def load_config(env_file: Optional[str] = None) -> Config:
         raise ConfigError("REQUEST_INTERVAL_SECONDS must be at least 1 (Tempus asks for at most 1 request per second)")
     if cfg.rank_lookup_interval_s < cfg.request_interval_s:
         raise ConfigError("RANK_LOOKUP_SECONDS can't be below REQUEST_INTERVAL_SECONDS")
-    if not 1 <= cfg.max_player_lines <= 24:
-        raise ConfigError("MAX_PLAYER_LINES must be between 1 and 24")
     if cfg.connect_url and "{addr}" not in cfg.connect_url:
         raise ConfigError("CONNECT_URL must contain {addr}")
     return cfg

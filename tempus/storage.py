@@ -78,6 +78,21 @@ class Storage:
         await self._db.execute("DELETE FROM seen_records WHERE seen_at < ?", (before,))
         await self._db.commit()
 
+    async def get_wr(self, zone_id: int, cls: int) -> Optional[Dict[str, Any]]:
+        async with self._db.execute("SELECT * FROM wrs WHERE zone_id = ? AND class = ?", (zone_id, cls)) as cur:
+            row = await cur.fetchone()
+        return dict(row) if row else None
+
+    async def save_wrs(self, rows: Sequence[Dict[str, Any]]) -> None:
+        """Remember WRs; an older one never replaces a newer one."""
+        await self._db.executemany(
+            "INSERT INTO wrs (zone_id, class, record_id, player_id, player, duration, date) VALUES (:zone_id, :class, :record_id, :player_id, :player, :duration, :date) "
+            "ON CONFLICT(zone_id, class) DO UPDATE SET record_id = excluded.record_id, player_id = excluded.player_id, player = excluded.player, "
+            "duration = excluded.duration, date = excluded.date WHERE excluded.date >= COALESCE(wrs.date, 0)",
+            rows,
+        )
+        await self._db.commit()
+
     async def record_snapshot(self, ts: float, servers: Sequence[Dict[str, Any]]) -> None:
         """One history point: every server with players on it, and the total."""
         await self._db.execute("INSERT OR REPLACE INTO snapshots (ts, players, servers) VALUES (?, ?, ?)", (ts, sum(s["players"] for s in servers), len(servers)))

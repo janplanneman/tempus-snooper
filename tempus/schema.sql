@@ -37,6 +37,18 @@ CREATE TABLE IF NOT EXISTS seen_records (
     seen_at   REAL NOT NULL
 );
 
+-- the latest WR seen in the activity feed per zone and class, so a new WR can say what it beat
+CREATE TABLE IF NOT EXISTS wrs (
+    zone_id   INTEGER NOT NULL,
+    class     INTEGER NOT NULL,
+    record_id INTEGER NOT NULL,
+    player_id INTEGER,
+    player    TEXT,
+    duration  REAL    NOT NULL,
+    date      REAL,
+    PRIMARY KEY (zone_id, class)
+);
+
 -- history: players online every few minutes, and the busy servers at that moment
 CREATE TABLE IF NOT EXISTS snapshots (
     ts      REAL PRIMARY KEY,

@@ -6,21 +6,22 @@ import os
 import tempfile
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
 import discord
 import pytest
 
-from tempus import history
-from tempus.board import CONTINUATION, FOOTER, MESSAGE_LIMIT, embeds_size, render_board, units
+from tempus import history, records
+from tempus.board import DETAILS_ID, MAX_COMPONENTS, MAX_TEXT, render_board, render_details, units
 from tempus.config import Config
 from tempus.ranks import RankService, rank_from_reply
-from tempus.regions import region_for
+from tempus.regions import flag, region_for
 from tempus.storage import Storage
 from tempus.tracker import next_map_state, parse_maps, parse_status
 
 FIXTURES = Path(__file__).with_name("fixtures")
 T = 1_800_000_000.0
+CONNECT = "https://tf2sa-clips.co.za/connect#{addr}"
 
 
 def fixture(name: str) -> Any:
@@ -31,18 +32,53 @@ def tiers_from_fixture() -> Dict[str, Any]:
     return {m["name"]: (m["tier_info"].get("3"), m["tier_info"].get("4")) for m in fixture("detailedList.json")}
 
 
-def check_limits(embeds: List[discord.Embed]) -> None:
-    assert 1 <= len(embeds) <= 10
-    assert embeds_size(embeds) + units(FOOTER) <= MESSAGE_LIMIT
-    assert sum(len(e) for e in embeds) <= MESSAGE_LIMIT
-    for e in embeds:
-        assert len(e.fields) <= 25 and units(e.description) <= 4096 and units(e.title) <= 256
-        for f in e.fields:
-            assert 0 < units(f.name) <= 256 and 0 < units(f.value) <= 1024
+def run(coro: Any) -> Any:
+    # discord.py views need a running event loop
+    return asyncio.run(coro)
 
 
-def board_text(embeds: List[discord.Embed]) -> str:
-    return "\n".join([e.description or "" for e in embeds] + [f"{f.name}\n{f.value}" for e in embeds for f in e.fields])
+def render(*args: Any, **kwargs: Any) -> Any:
+    async def go() -> Any:
+        return render_board(*args, **kwargs)
+    return run(go())
+
+
+def walk(components: List[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
+    for c in components:
+        yield c
+        yield from walk(c.get("components") or [])
+        if c.get("accessory"):
+            yield c["accessory"]
+
+
+def texts(view: Any) -> List[str]:
+    return [c["content"] for c in walk(view.to_components()) if c["type"] == 10]
+
+
+def buttons(view: Any) -> List[Dict[str, Any]]:
+    return [c for c in walk(view.to_components()) if c["type"] == 2]
+
+
+def select(view: Any) -> Optional[Dict[str, Any]]:
+    return next((c for c in walk(view.to_components()) if c["type"] == 3), None)
+
+
+def check_limits(view: Any) -> None:
+    """What Discord checks on a components v2 message."""
+    components = list(walk(view.to_components()))
+    assert len(components) <= MAX_COMPONENTS
+    assert sum(units(t) for t in texts(view)) <= MAX_TEXT
+    for c in components:
+        if c["type"] == 9:  # section: 1-3 text displays and an accessory
+            assert 1 <= len(c["components"]) <= 3 and c["accessory"]
+        if c["type"] == 1:  # action row
+            assert 1 <= len(c["components"]) <= 5
+        if c["type"] == 2:
+            assert 0 < len(c["label"]) <= 80 and c["url"].startswith("https://") and len(c["url"]) <= 512
+        if c["type"] == 3:
+            assert 1 <= len(c["options"]) <= 25 and len(c.get("placeholder") or "") <= 150
+            for o in c["options"]:
+                assert 0 < len(o["label"]) <= 100 and len(o.get("description") or "") <= 100 and len(o["value"]) <= 100
 
 
 # --- statusList ---------------------------------------------------------------------------------------------------
@@ -72,13 +108,16 @@ def test_parse_status_survives_odd_entries() -> None:
         parse_status({"error": "not a list"})
 
 
-def test_regions() -> None:
+def test_regions_and_flags() -> None:
     assert region_for("Germany") == "Europe" and region_for("russia ") == "Europe" and region_for("United States") == "North America"
     assert region_for("Brazil") == "South America" and region_for("Hong Kong") == "Asia" and region_for("New Zealand") == "Oceania"
     assert region_for("Israel") == "Middle East" and region_for("South Africa") == "Africa"
     assert region_for("") == "Other" and region_for(None) == "Other" and region_for("Atlantis") == "Other"
     servers, _ = parse_status(fixture("statusList.json"))
     assert not [s["country"] for s in servers if s["region"] == "Other"]
+    assert flag("Germany") == "🇩🇪" and flag("united kingdom") == "🇬🇧" and flag(code="au") == "🇦🇺"
+    assert flag("Atlantis") == "🌐" and flag("") == "🌐" and flag(code="ÄB") == "🌐"
+    assert all(flag(s["country"]) != "🌐" for s in servers)
 
 
 def test_parse_maps() -> None:
@@ -111,34 +150,44 @@ def test_board_from_fixture() -> None:
     tiers = tiers_from_fixture()
     au2 = next(s for s in servers if s["shortname"] == "AU2")
     au2["map_since"] = T - 23 * 60
-    embeds = render_board(servers, ranks, tiers, connect_url="https://tf2sa-clips.co.za/connect#{addr}")
-    check_limits(embeds)
-    assert embeds[0].title == "Tempus jump servers"
-    assert embeds[0].description == "53 players on 31 servers right now (28 empty)"
-    assert [e.title.split(" · ")[0] for e in embeds[1:]] == ["Europe", "Asia", "Oceania", "North America", "South America"]
-    text = board_text(embeds)
-    assert "[Connect](https://tf2sa-clips.co.za/connect#51.161.199.24:27025)" in text
-    assert "[jump\\_stella\\_v2](https://tempus2.xyz/maps/jump_stella_v2) · T5 S / T2 D · started <t:1799998620:R>" in text
-    assert "fishsoup" in text and "#2498" in text
-    # quiet servers still show up as a compact line
-    assert "**DE2** 1/24 · `jump_hulk_a4` · T3 S / T3 D · [Connect](https://tf2sa-clips.co.za/connect#135.125.189.212:27025)" in text and "+8 quieter servers" in text
-    # nothing depends on the clock: the same data renders the same board, so no edit is needed
-    again = render_board(servers, ranks, tiers, connect_url="https://tf2sa-clips.co.za/connect#{addr}")
-    assert [e.to_dict() for e in again] == [e.to_dict() for e in embeds]
+    board = render(servers, ranks, tiers, connect_url=CONNECT, usual=(61, "Fridays"))
+    check_limits(board)
+    t = texts(board)
+    assert t[0] == "## Tempus jump servers\n**53 players** on **31 servers** right now · 28 empty\n-# Usually around 61 players at this time on Fridays (UTC)"
+    headings = [line.split(" · ")[0] for text in t for line in text.splitlines() if line.startswith("### ")]
+    assert headings == ["### Europe", "### Asia", "### Oceania", "### North America", "### South America"]
+    au2_row = next(x for x in t if "**AU2**" in x)
+    assert au2_row.splitlines()[0] == "🇦🇺 **AU2** · [jump\\_stella\\_v2](https://tempus2.xyz/maps/jump_stella_v2) · T5 S / T2 D · **3**/24"
+    assert au2_row.splitlines()[1].startswith("fishsoup #2498 · ")  # ranked players first
+    assert au2_row.splitlines()[2] == "-# jump.tf (Sydney) All Maps #1 · map started <t:1799998620:R>"
+    assert {"type": 2, "style": 5, "label": "Join", "url": "https://tf2sa-clips.co.za/connect#51.161.199.24:27025"} in [
+        {k: b[k] for k in ("type", "style", "label", "url")} for b in buttons(board)]
+    joined = "\n".join(t)
+    # every busy server is on the board: in a row or in its region's "Also" line
+    for s in servers:
+        if s["players"]:
+            assert f"**{s['shortname']}**" in joined or f" {s['shortname']} " in joined or f"Also: {s['shortname']} " in joined
+    assert "DE2 jump\\_hulk\\_a4 1/24" in joined or "**DE2**" in joined
+    menu = select(board)
+    assert menu["custom_id"] == DETAILS_ID and len(menu["options"]) == 25
+    assert menu["options"][0]["label"] == "DE1 · jump_ataronchronon_b2" and menu["options"][0]["description"] == "4/24 · jump.tf (Frankfurt) Beginners"
+    assert t[-1].startswith("-# Data from [tempus2.xyz](https://tempus2.xyz)")
 
-    usual = render_board(servers, ranks, tiers, usual=(61, "Fridays"))
-    assert usual[0].description.splitlines()[1] == "Usually around 61 players at this time on Fridays (UTC)"
-    assert "Connect" not in board_text(usual)  # no connect page configured: console command instead
-    assert "`connect 51.161.199.24:27025`" in board_text(usual)
+    # nothing depends on the clock, and the footer's "last change" time doesn't count as a change
+    again = render(servers, ranks, tiers, connect_url=CONNECT, usual=(61, "Fridays"))
+    again.footer.content = "-# Last change <t:1:R>"
+    assert again.signature() == board.signature() and again.footer.content == "-# Last change <t:1:R>"
+    au2["users"].append({"id": 5, "name": "late joiner"})
+    au2["players"] += 1
+    assert render(servers, ranks, tiers, connect_url=CONNECT, usual=(61, "Fridays")).signature() != board.signature()
 
-    europe = render_board(servers, ranks, tiers, region="Europe", usual=(40, "Fridays"))
+    europe = render(servers, ranks, tiers, connect_url=CONNECT, region="Europe", usual=(40, "Fridays"))
     check_limits(europe)
-    assert europe[0].title == "Tempus jump servers · Europe"
-    assert europe[0].description.splitlines() == ["32 players on 17 servers in Europe right now (8 empty)", "Usually around 40 players in Europe at this time on Fridays (UTC)"]
-    assert len(europe) == 2 and "quieter" not in board_text(europe)  # one region alone has room for every card
+    assert texts(europe)[0].splitlines()[1:] == ["**32 players** on **17 servers** in Europe right now · 8 empty", "-# Usually around 40 players in Europe at this time on Fridays (UTC)"]
+    assert sum("**" in x and "/24" in x for x in texts(europe)) > sum("**" in x and "/24" in x and "🇩🇪" in x or "🇫🇷" in x for x in t if "Europe" in x)
 
 
-def test_board_full_lists_fit_discord_limits() -> None:
+def test_board_full_load_fits_discord_limits() -> None:
     servers, _ = parse_status(fixture("statusList.json"))
     tiers = tiers_from_fixture()
     names = ["プレイヤーの名前がとても長い", "😀😀 emoji_name_long_long 😀", "Zalgo̶̢̧ n̷a̸m̵e̴ here long", "back`tick`name__**bold**", "x" * 32]
@@ -148,54 +197,56 @@ def test_board_full_lists_fit_discord_limits() -> None:
         s["players"], s["max_players"] = 24, 24
         s["name"] = s["name"] + " | ★ Rank 500 Only ★ | Tempus Network | 日本語のサーバー名"
         ranks.update({u["id"]: 100000 + u["id"] for u in s["users"][::2]})
-    embeds = render_board(servers, ranks, tiers, connect_url="https://tf2sa-clips.co.za/connect#{addr}", usual=(150, "Saturdays"), stale_since=T)
-    check_limits(embeds)
-    text = board_text(embeds)
-    assert embeds[0].description.startswith("1416 players on 59 servers right now\n") and "more servers" not in embeds[0].description
-    assert "+16 more" in text  # cards are capped
-    assert "quieter servers" in text and not any("Connect" in f.value for e in embeds for f in e.fields if "server" in f.name)  # compact lines lost Connect
+    board = render(servers, ranks, tiers, connect_url=CONNECT, usual=(1500, "Saturdays"), stale_since=T)
+    check_limits(board)
+    joined = "\n".join(texts(board))
+    assert "**1416 players** on **59 servers**" in joined and "No answer from Tempus since <t:1800000000:R>" in joined
+    assert "more" in joined and "`" not in joined.replace("`connect", "")
 
-    # three times as many busy servers: the quietest become "+N more servers"
+    # three times as many busy servers: the "Also" lines are cut short with "+N more"
     many = [dict(s, id=s["id"] + k * 1000, shortname=f"{s['shortname']}-{k}") for k in range(3) for s in servers]
     for i, s in enumerate(many):
         s["players"] = 1 + i % 24
-    embeds = render_board(many, ranks, tiers, connect_url="https://tf2sa-clips.co.za/connect#{addr}")
-    check_limits(embeds)
-    assert "more servers" in embeds[0].description
-    assert "`" not in text.replace("```", "").replace("`connect", "").replace("`jump", "").replace("`rj", "").replace("` ·", "").replace("`\n", "")
-
-    # all servers busy in one region: field limits, not characters, are the constraint
-    one_region = [dict(s, region="Europe", users=s["users"][:1], players=1) for s in servers]
-    embeds = render_board(one_region, ranks, tiers, connect_url="https://tf2sa-clips.co.za/connect#{addr}")
-    check_limits(embeds)
-    shown = sum(1 for e in embeds for f in e.fields if f.name != CONTINUATION and "server" not in f.name) + sum(
-        f.value.count("\n") + 1 for e in embeds for f in e.fields if "server" in f.name or f.name == CONTINUATION)
-    dropped = int(embeds[0].description.split("+")[1].split()[0]) if "more servers" in embeds[0].description else 0
-    assert shown + dropped == 59
+    board = render(many, ranks, tiers, connect_url=CONNECT)
+    check_limits(board)
+    assert any("Also:" in x and x.rstrip().endswith("more") for x in texts(board))
 
 
-def test_board_player_lines() -> None:
-    s = {"id": 1, "shortname": "GBR3", "name": "jump.tf *London* All_Maps", "region": "Europe", "online": True, "ip": None, "host": "london.tempus2.xyz",
-         "port": 27035, "map": "rj_unknown", "max_players": 24, "map_since": None, "players": 4,
+def test_board_rows_without_ip_and_details() -> None:
+    s = {"id": 1, "shortname": "GBR3", "name": "jump.tf *London* All_Maps", "country": "United Kingdom", "region": "Europe", "online": True, "ip": None,
+         "host": "london.tempus2.xyz", "port": 27035, "map": "rj_unknown", "max_players": 24, "map_since": None, "players": 5,
          "users": [{"id": 0, "name": "new`guy"}, {"id": 7, "name": "漢字の名前"}, {"id": 8, "name": "top"}, {"id": 9, "name": "unranked"}]}
-    e = render_board([s], {7: 2498, 8: 16, 9: None}, {}, connect_url="https://tf2sa-clips.co.za/connect#{addr}")
-    check_limits(e)
-    f = e[1].fields[0]
-    assert f.name == "GBR3 · jump.tf \\*London\\* All\\_Maps"
-    assert f.value.splitlines()[:2] == ["[rj\\_unknown](https://tempus2.xyz/maps/rj_unknown)", "4/24 · `connect london.tempus2.xyz:27035`"]
-    lines = f.value.split("```")[1].strip("\n").splitlines()
-    assert [ln.split()[0] for ln in lines] == ["top", "漢字の名前", "new'guy", "unranked"]
+    board = render([s], {7: 2498, 8: 16, 9: None}, {}, connect_url=CONNECT)
+    check_limits(board)
+    row = next(x for x in texts(board) if "**GBR3**" in x)
+    assert row.splitlines() == ["🇬🇧 **GBR3** · [rj\\_unknown](https://tempus2.xyz/maps/rj_unknown) · **5**/24",
+                                "top #16 · 漢字の名前 #2498 · new\\`guy · unranked · +1 more", "-# jump.tf \\*London\\* All\\_Maps"]
+    # no IP: the connect page can't take it, so the row links to the server's Tempus page
+    assert [b["label"] for b in buttons(board)] == ["Info"] and buttons(board)[0]["url"] == "https://tempus2.xyz/servers/1"
+
+    async def details() -> Any:
+        return render_details(s, {7: 2498, 8: 16}, {}, CONNECT)
+    view = run(details())
+    check_limits(view)
+    block = next(x for x in texts(view) if x.startswith("```"))
+    lines = block.strip("`\n").splitlines()
+    assert [ln.split()[0] for ln in lines] == ["top", "漢字の名前", "new'guy", "unranked", "+1"]
     assert lines[0].endswith("    #16") and lines[1].endswith("  #2498") and lines[2].endswith(" " * 7)
     # wide characters take two columns, so the rank column lines up
-    assert all(sum(2 if ord(c) > 0x2E80 else 1 for c in ln) == 26 for ln in lines)
+    assert all(sum(2 if ord(c) > 0x2E80 else 1 for c in ln) == 26 for ln in lines[:4])
+    assert "Join from the TF2 console: `connect london.tempus2.xyz:27035`" in texts(view)
+    assert [b["label"] for b in buttons(view)] == ["Map on Tempus", "Server on Tempus"]
+    s["ip"] = "1.2.3.4"
+    assert [b["label"] for b in buttons(run(details()))] == ["Join", "Map on Tempus", "Server on Tempus"]
 
 
 def test_board_nobody_playing() -> None:
     servers, _ = parse_status(fixture("statusList.json"))
     for s in servers:
         s["users"], s["players"] = [], 0
-    e = render_board(servers, {}, {})
-    assert len(e) == 1 and e[0].description == "Nobody is playing on Tempus right now."
+    board = render(servers, {}, {})
+    check_limits(board)
+    assert texts(board)[0] == "## Tempus jump servers\nNobody is playing on Tempus right now." and select(board) is None
 
 
 # --- history ------------------------------------------------------------------------------------------------------
@@ -218,7 +269,7 @@ def test_history_usual_grid_and_chart_in_utc() -> None:
 
 
 def test_history_storage_and_region_series() -> None:
-    async def run() -> None:
+    async def go() -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = await Storage.open(os.path.join(tmp, "t.db"))
             await store.record_snapshot(1000.0, [{"server_id": 1, "region": "Europe", "map": "jump_a", "players": 5}, {"server_id": 2, "region": "Asia", "map": "jump_b", "players": 3},
@@ -232,7 +283,7 @@ def test_history_storage_and_region_series() -> None:
             assert [s["ts"] for s in await store.snapshots_since(0, "Asia")] == [2000.0, 3000.0]
             await store.close()
 
-    asyncio.run(run())
+    run(go())
 
 
 # --- tempus client ------------------------------------------------------------------------------------------------
@@ -245,7 +296,7 @@ def test_client_rate_limit_429_invalid_utf8_and_404() -> None:
 
     hits: Dict[str, List[float]] = {}
 
-    async def run() -> None:
+    async def go() -> None:
         async def handler(request: web.Request) -> web.Response:
             name = request.match_info["name"]
             hits.setdefault(name, []).append(time.monotonic())
@@ -294,7 +345,7 @@ def test_client_rate_limit_429_invalid_utf8_and_404() -> None:
         finally:
             await runner.cleanup()
 
-    asyncio.run(run())
+    run(go())
 
 
 def test_retry_after_parsing() -> None:
@@ -325,7 +376,7 @@ def test_rank_service_queue() -> None:
                 raise NotFound(path)
             return fixture("rank.json")
 
-    async def run() -> None:
+    async def go() -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = await Storage.open(os.path.join(tmp, "t.db"))
             client = FakeClient()
@@ -346,15 +397,14 @@ def test_rank_service_queue() -> None:
             assert again.known([5, 664833]) == {5: None, 664833: 2498}
             await store.close()
 
-    asyncio.run(run())
+    run(go())
 
 
 # --- records feed -------------------------------------------------------------------------------------------------
 
-def test_records_feed() -> None:
-    from tempus import records
+def test_records_feed_selection() -> None:
     entries = records.flatten(fixture("activity.json"))
-    assert len(entries) == 15 and {e["kind"] for e in entries} == set(records.KINDS)
+    assert len(entries) == 15 and {e["kind"] for e in entries} == set(records.KINDS) and all(e["zone_id"] for e in entries)
     newest = max(e["date"] for e in entries)
     fresh = records.new_records(entries, set(), include_tops=False, now_ts=newest + 60)
     assert fresh and all(r["kind"] in records.WR_KINDS for r in fresh)
@@ -362,16 +412,38 @@ def test_records_feed() -> None:
     assert len(records.new_records(entries, set(), include_tops=True, now_ts=newest + 60)) >= len(fresh)
     assert not records.new_records(entries, {e["id"] for e in entries}, True, newest + 60)
     assert not records.new_records(entries, set(), True, newest + 30 * 86400)  # too old to announce
-    assert records.fmt_time(65.985) == "1:05.985" and records.fmt_time(9.5) == "9.500" and records.fmt_time(3725.01) == "1:02:05.010"
-
-    wr = dict(entries[0], kind="map_wrs", map="jump_stella_v2", player="geek_[x]", player_id=99892, **{"class": 4}, duration=65.985, server_id=10)
-    line = records.record_line(wr, tiers_from_fixture(), {10: "AU2"})
-    assert line == "🏆 **Map WR** · [jump\\_stella\\_v2](https://tempus2.xyz/maps/jump_stella_v2) T2 · [geek\\_(x)](https://tempus2.xyz/players/99892) · Demoman · **1:05.985** · on AU2"
-    bonus = dict(wr, kind="bonus_wrs", zone_type="bonus", zone_index=2, zone_name=None, server_id=None)
-    assert " Bonus 2 · " in records.record_line(bonus, {}, {}) and " on " not in records.record_line(bonus, {}, {})
-    top = dict(wr, kind="map_tops", rank=4)
-    assert records.record_line(top, {}, {}).startswith("🎖️ **#4 map time**")
     assert records.flatten({"map_wrs": [{"junk": 1}], "trick_wrs": None}) == []
+    assert records.fmt_time(65.985) == "1:05.985" and records.fmt_time(9.5) == "9.500" and records.fmt_time(3725.01) == "1:02:05.010"
+    memory = records.wr_memory_rows(entries)
+    assert len({(m["zone_id"], m["class"]) for m in memory}) == len(memory) and all(m["record_id"] for m in memory)
+
+
+def test_record_embeds() -> None:
+    context = records.leaderboard_context(fixture("zone_records.json"), 4)
+    assert context["tier"] == 5 and context["completions"] == 268 and context["country_code"] == "AU"
+    assert context["second"]["duration"] == 66.51
+    assert records.leaderboard_context(fixture("zone_records.json"), 3) == {"tier": 0, "completions": 0}
+
+    wr = {"id": 8803077, "kind": "map_wrs", "class": 4, "duration": 65.985, "date": T, "server_id": 10, "rank": None, "zone_id": 10274,
+          "player_id": 99892, "player": "geek_[x]", "map": "jump_lamia", "zone_type": "map", "zone_index": 1, "zone_name": ""}
+    e = records.record_embed(wr, {}, {10: "AU2"}, previous=None, context=context)
+    assert e.title == "🏆 New map WR · jump_lamia" and e.url == "https://tempus2.xyz/maps/jump_lamia"
+    second = context["second"]["player"]
+    assert e.description == f"🇦🇺 **[geek\\_(x)](https://tempus2.xyz/players/99892)** · Demoman · **1:05.985**\n**0.525 s** ahead of #2 {second}"
+    assert e.footer.text == "Tier 5 · 268 demoman completions · set on AU2" and e.timestamp is not None
+
+    old = {"record_id": 1, "player_id": 42, "player": "Farma", "duration": 66.516}
+    assert records.record_embed(wr, {}, {}, previous=old, context={}).description.endswith("Beats the old WR by **0.531 s** (Farma, 1:06.516)")
+    own = dict(old, player_id=99892)
+    assert records.record_embed(wr, {}, {}, previous=own).description.endswith("Improves their own WR by **0.531 s**")
+    first = records.record_embed(wr, {}, {}, context={"completions": 1})
+    assert first.description.endswith("First completion") and first.footer.text == "1 demoman completion"
+
+    bonus = dict(wr, kind="bonus_wrs", zone_type="bonus", zone_index=2)
+    assert records.record_embed(bonus, {}, {}).title == "⭐ New bonus WR · jump_lamia · Bonus 2"
+    top = dict(wr, kind="map_tops", rank=4)
+    assert records.record_embed(top, {"jump_lamia": (2, 5)}, {}).title == "🎖️ #4 on jump_lamia"
+    assert records.record_embed(top, {"jump_lamia": (2, 5)}, {}).footer.text == "Tier 5"
 
 
 # --- discord side -------------------------------------------------------------------------------------------------
@@ -385,11 +457,19 @@ class FakeMessage:
     def __init__(self, channel: "FakeChannel", mid: int) -> None:
         self.channel, self.id = channel, mid
 
-    async def edit(self, embeds: Any) -> None:
+    def _check(self) -> None:
         if self.id not in self.channel.messages:
             import types
             raise discord.NotFound(types.SimpleNamespace(status=404, reason="Not Found"), "gone")
+
+    async def edit(self, view: Any) -> None:
+        self._check()
         self.channel.edits += 1
+        self.channel.last_view = view
+
+    async def delete(self) -> None:
+        self._check()
+        self.channel.messages.remove(self.id)
 
 
 class FakeChannel:
@@ -398,14 +478,16 @@ class FakeChannel:
         self.messages: List[int] = []
         self.sent: List[Any] = []
         self.edits = 0
+        self.last_view: Any = None
 
     def permissions_for(self, member: Any) -> FakePerms:
         return FakePerms(self.ok)
 
-    async def send(self, embeds: Any) -> FakeMessage:
-        mid = self.id * 100 + len(self.messages) + 1
+    async def send(self, embeds: Any = None, view: Any = None) -> FakeMessage:
+        mid = self.id * 1000 + len(self.sent) + 1  # never the id of a message posted before the test
         self.messages.append(mid)
-        self.sent.append(embeds)
+        self.sent.append(view if view is not None else embeds)
+        self.last_view = view
         return FakeMessage(self, mid)
 
     def get_partial_message(self, mid: int) -> FakeMessage:
@@ -444,7 +526,7 @@ def test_status_board_per_guild_permissions_and_skipped_edits(caplog) -> None:
     import logging
     from tempus.cog import ServersCog
 
-    async def run() -> None:
+    async def go() -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = await Storage.open(os.path.join(tmp, "t.db"))
             cfg = Config(discord_token="x", guild_id=1)
@@ -465,8 +547,7 @@ def test_status_board_per_guild_permissions_and_skipped_edits(caplog) -> None:
             locked.ok = True
             await cog.update_board()
             assert len(locked.messages) == 1 and locked.edits == 0
-            board = locked.sent[0]
-            assert board[-1].footer.text == FOOTER and board[-1].timestamp is not None
+            assert texts(locked.sent[0])[-1].startswith("-# Last change <t:")
             await cog.update_board()
             assert locked.edits == 0  # nothing changed, so no edit
 
@@ -479,6 +560,7 @@ def test_status_board_per_guild_permissions_and_skipped_edits(caplog) -> None:
             other.text_channels.append(added)
             await cog.update_board()
             assert added.messages and len(locked.messages) == 1 and locked.edits == 1
+            assert added.sent[0] is not locked.last_view  # one view object per message
 
             locked.messages.clear()  # someone deleted the board
             tracker.servers[0]["players"] += 1
@@ -493,44 +575,106 @@ def test_status_board_per_guild_permissions_and_skipped_edits(caplog) -> None:
             assert await fresh.build_board() is None  # no board before the first reply from Tempus
             await store.close()
 
-    asyncio.run(run())
+    run(go())
 
 
-def test_records_posted_once_and_not_on_first_run() -> None:
+def test_old_embed_board_is_replaced() -> None:
     from tempus.cog import ServersCog
 
-    async def run() -> None:
+    async def go() -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = await Storage.open(os.path.join(tmp, "t.db"))
+            channel = FakeChannel(11, "tempus-status", ok=True)
+            channel.messages.append(1101)  # the embed board from before
+            await store.kv_set("status_board:1", "11:1101")
+            cog = ServersCog(FakeBot([FakeGuild(1, "Home", [channel])]), Config(discord_token="x"), store, None, FakeTracker(), RankService(store, None, 1, 1))  # type: ignore[arg-type]
+            await cog.update_board()
+            assert 1101 not in channel.messages and len(channel.messages) == 1 and channel.edits == 0
+            assert (await store.kv_get("status_board:1")) == f"11:{channel.messages[0]}:2"
+            await store.close()
+
+    run(go())
+
+
+def test_details_menu() -> None:
+    import types
+    from tempus.cog import ServersCog
+
+    sent: List[Dict[str, Any]] = []
+
+    class Response:
+        async def send_message(self, content: Optional[str] = None, view: Any = None, ephemeral: bool = False) -> None:
+            sent.append({"content": content, "view": view, "ephemeral": ephemeral})
+
+    def interaction(value: str, custom_id: str = DETAILS_ID) -> Any:
+        return types.SimpleNamespace(type=discord.InteractionType.component, data={"custom_id": custom_id, "values": [value]}, response=Response())
+
+    async def go() -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = await Storage.open(os.path.join(tmp, "t.db"))
+            tracker = FakeTracker()
+            cog = ServersCog(FakeBot([]), Config(discord_token="x"), store, None, tracker, RankService(store, None, 1, 1))  # type: ignore[arg-type]
+            au2 = next(s for s in tracker.servers if s["shortname"] == "AU2")
+            await cog.on_interaction(interaction(str(au2["id"])))
+            await cog.on_interaction(interaction("999999"))
+            await cog.on_interaction(interaction(str(au2["id"]), custom_id="something:else"))
+            assert len(sent) == 2 and all(m["ephemeral"] for m in sent)
+            assert "fishsoup" in "\n".join(texts(sent[0]["view"])) and [b["label"] for b in buttons(sent[0]["view"])][0] == "Join"
+            assert sent[1]["content"] == "That server isn't online any more."
+            await store.close()
+
+    run(go())
+
+
+def test_records_posted_once_with_what_they_beat() -> None:
+    from tempus.cog import ServersCog
+
+    class FakeClient:
+        def __init__(self) -> None:
+            self.calls: List[str] = []
+
+        async def get(self, path: str) -> Any:
+            self.calls.append(path)
+            return fixture("zone_records.json")
+
+    async def go() -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = await Storage.open(os.path.join(tmp, "t.db"))
             feed = FakeChannel(30, "tempus-records", ok=True)
-            guild = FakeGuild(3, "G", [feed])
-            cog = ServersCog(FakeBot([guild]), Config(discord_token="x"), store, None, FakeTracker(), RankService(store, None, 1, 1))  # type: ignore[arg-type]
+            client = FakeClient()
+            cog = ServersCog(FakeBot([FakeGuild(3, "G", [feed])]), Config(discord_token="x"), store, client, FakeTracker(), RankService(store, None, 1, 1))  # type: ignore[arg-type]
             activity = fixture("activity.json")
             await cog.on_activity(activity)
-            assert feed.sent == []  # what's in the feed at the start is old news
+            assert feed.sent == [] and client.calls == []  # what's in the feed at the start is old news
 
-            newest = max(e["record_info"]["date"] for k in activity for e in activity[k])
-            wr = json.loads(json.dumps(activity["map_wrs"][0]))
-            wr["record_info"].update(id=999_999_999, date=time.time() - 60)
+            # a new WR on a zone whose old WR the bot saw in the first feed
+            old = activity["map_wrs"][0]
+            wr = json.loads(json.dumps(old))
+            wr["record_info"].update(id=999_999_999, date=time.time() - 60, duration=old["record_info"]["duration"] - 0.5, user_id=1)
+            wr["player_info"].update(id=1, name="newcomer")
             top = json.loads(json.dumps(activity["map_tops"][0]))
             top["record_info"].update(id=999_999_998, date=time.time() - 60)
             activity["map_wrs"].insert(0, wr)
             activity["map_tops"].insert(0, top)
             await cog.on_activity(activity)
             await cog.on_activity(activity)
-            assert len(feed.sent) == 1 and len(feed.sent[0]) == 1
-            assert feed.sent[0][0].title == "New Tempus record" and "**Map WR**" in feed.sent[0][0].description
-            assert newest < time.time()
+            assert len(feed.sent) == 1 and len(feed.sent[0]) == 1 and len(client.calls) == 1
+            embed = feed.sent[0][0]
+            assert embed.title.startswith("🏆 New map WR · ") and "newcomer" in embed.description
+            assert f"Beats the old WR by **0.500 s** ({old['player_info']['name']}" in embed.description
+            assert client.calls[0] == f"zones/id/{old['record_info']['zone_id']}/records/list?limit=3"
+            # the new WR is now the one to beat
+            assert (await store.get_wr(old["record_info"]["zone_id"], old["record_info"]["class"]))["record_id"] == 999_999_999
             await store.close()
 
-    asyncio.run(run())
+    run(go())
 
 
 def test_list_messages_stay_within_discord_limits() -> None:
     from tempus.cog import list_messages
-    lines = [f"🏆 **Map WR** · [jump_map_{i}](https://tempus2.xyz/maps/jump_map_{i}) T5 · [Player {i}](https://tempus2.xyz/players/{i}) · Soldier · **1:05.985**" for i in range(300)]
-    messages = list_messages("300 new Tempus records", lines)
+    lines = [f"**Player {i}** · [jump_map_{i}](https://tempus2.xyz/maps/jump_map_{i}) · `connect 1.2.3.4:27015`" for i in range(300)]
+    messages = list_messages("300 players matching \"p\"", lines)
     shown = "\n".join(e.description for m in messages for e in m)
-    assert all(f"[Player {i}]" in shown for i in range(300))
+    assert all(f"**Player {i}**" in shown for i in range(300))
     for embeds in messages:
         assert len(embeds) <= 10 and sum(len(e) for e in embeds) <= 6000 and all(len(e.description) <= 4096 for e in embeds)

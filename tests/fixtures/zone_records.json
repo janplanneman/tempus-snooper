@@ -1,0 +1,119 @@
+{
+ "zone_info": {
+  "id": 10274,
+  "map_id": 705,
+  "zoneindex": 1,
+  "custom_name": null,
+  "type": "map"
+ },
+ "tier_info": {
+  "4": 5,
+  "3": 0
+ },
+ "rating_info": {
+  "4": 2,
+  "3": 4
+ },
+ "completion_info": {
+  "soldier": 0,
+  "demoman": 268
+ },
+ "results": {
+  "soldier": [],
+  "demoman": [
+   {
+    "id": 8803077,
+    "zone_id": 10274,
+    "duration": 65.985,
+    "class": 4,
+    "date": 1792151599.736296,
+    "demo_info": {
+     "id": 4073710,
+     "start_tick": 64232,
+     "end_tick": 68632,
+     "url": "https://demos-archive.tempus2.xyz/38/d2/auto-20261016-113610-jump_lamia.zip",
+     "server_info": {
+      "id": 38,
+      "name": "jump.tf (Sydney) Rank 50 Only"
+     }
+    },
+    "user_id": 99892,
+    "name": "geeked",
+    "steamid": "STEAM_0:0:900",
+    "rank": 1,
+    "placement": 1,
+    "player_info": {
+     "id": 99892,
+     "steamid": "STEAM_0:0:900",
+     "name": "geeked",
+     "first_seen": 1437818785.1931868,
+     "last_seen": 1792162749.1664429,
+     "country": "Australia",
+     "country_code": "AU"
+    }
+   },
+   {
+    "id": 8714453,
+    "zone_id": 10274,
+    "duration": 66.51,
+    "class": 4,
+    "date": 1788088340.89575,
+    "demo_info": {
+     "id": 4011783,
+     "start_tick": 187852,
+     "end_tick": 192287,
+     "url": "https://demos-archive.tempus2.xyz/4/93/auto-20260830-102416-jump_lamia.zip",
+     "server_info": {
+      "id": 4,
+      "name": "matcha (Singapore) All Maps #1"
+     }
+    },
+    "user_id": 243670,
+    "name": "cander",
+    "steamid": "STEAM_0:0:901",
+    "rank": 2,
+    "placement": 2,
+    "player_info": {
+     "id": 243670,
+     "steamid": "STEAM_0:0:901",
+     "name": "cander",
+     "first_seen": 1484394377.9585412,
+     "last_seen": 1792145851.6514137,
+     "country": "Indonesia",
+     "country_code": "ID"
+    }
+   },
+   {
+    "id": 7334047,
+    "zone_id": 10274,
+    "duration": 71.715,
+    "class": 4,
+    "date": 1721865584.9775994,
+    "demo_info": {
+     "id": 2963484,
+     "start_tick": 226172,
+     "end_tick": 230954,
+     "url": "https://demos-archive.tempus2.xyz/38/3f/auto-20240724-230200-jump_lamia.zip",
+     "server_info": {
+      "id": 38,
+      "name": "jump.tf (Sydney) Rank 50 Only"
+     }
+    },
+    "user_id": 1320,
+    "name": "Matty",
+    "steamid": "STEAM_0:0:902",
+    "rank": 3,
+    "placement": 3,
+    "player_info": {
+     "id": 1320,
+     "steamid": "STEAM_0:0:902",
+     "name": "Matty",
+     "first_seen": 1399122030.953,
+     "last_seen": 1792019574.2880504,
+     "country": "Australia",
+     "country_code": "AU"
+    }
+   }
+  ]
+ }
+}
