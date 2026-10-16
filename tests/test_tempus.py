@@ -144,6 +144,21 @@ def test_map_state() -> None:
 
 # --- board --------------------------------------------------------------------------------------------------------
 
+NB = " "
+
+
+def no_dots_or_escaped_labels(view: Any) -> None:
+    """The owner's rules: no middle dots anywhere, and no backslash escapes inside [link labels], which Discord shows."""
+    import re
+    for text in texts(view):
+        assert "·" not in text
+        for label in re.findall(r"\[([^\]]*)\]\(", text):
+            assert "\\" not in label, label
+    for c in walk(view.to_components()):
+        if c["type"] == 3:
+            assert not any("·" in o["label"] + (o.get("description") or "") for o in c["options"])
+
+
 def test_board_from_fixture() -> None:
     servers, _ = parse_status(fixture("statusList.json"))
     ranks = {664833: 2498, 0: None}
@@ -152,26 +167,28 @@ def test_board_from_fixture() -> None:
     au2["map_since"] = T - 23 * 60
     board = render(servers, ranks, tiers, connect_url=CONNECT, usual=(61, "Fridays"))
     check_limits(board)
+    no_dots_or_escaped_labels(board)
     t = texts(board)
-    assert t[0] == "## Tempus jump servers\n**53 players** on **31 servers** right now · 28 empty\n-# Usually around 61 players at this time on Fridays (UTC)"
-    headings = [line.split(" · ")[0] for text in t for line in text.splitlines() if line.startswith("### ")]
+    assert t[0] == "## Tempus jump servers\n**53 players** on **31 servers** right now, 28 empty\n-# Usually around 61 players at this time on Fridays (UTC)"
+    headings = [line for text in t for line in text.splitlines() if line.startswith("### ")]
     assert headings == ["### Europe", "### Asia", "### Oceania", "### North America", "### South America"]
-    au2_row = next(x for x in t if "**AU2**" in x)
-    assert au2_row.splitlines()[0] == "🇦🇺 **AU2** · [jump\\_stella\\_v2](https://tempus2.xyz/maps/jump_stella_v2) · T5 S / T2 D · **3**/24"
-    assert au2_row.splitlines()[1].startswith("fishsoup #2498 · ")  # ranked players first
-    assert au2_row.splitlines()[2] == "-# jump.tf (Sydney) All Maps #1 · map started <t:1799998620:R>"
+    assert "### Europe\n-# 32 players on 17 servers" in t
+    au2_row = next(x for x in t if "**AU2**" in x).splitlines()
+    assert au2_row[0] == "🇦🇺 **AU2** jump.tf (Sydney) All Maps #1 (3/24)"
+    assert au2_row[1] == "[jump_stella_v2](https://tempus2.xyz/maps/jump_stella_v2), T5 soldier, T2 demo"
+    assert au2_row[2] == f"`{NB * 2}#2498` fishsoup"  # ranked players first, one per line
+    assert au2_row[3].startswith(f"`{NB * 6}–` ") and au2_row[-1] == "-# map started <t:1799998620:R>"
     assert {"type": 2, "style": 5, "label": "Join", "url": "https://tf2sa-clips.co.za/connect#51.161.199.24:27025"} in [
         {k: b[k] for k in ("type", "style", "label", "url")} for b in buttons(board)]
     joined = "\n".join(t)
     # every busy server is on the board: in a row or in its region's "Also" line
     for s in servers:
         if s["players"]:
-            assert f"**{s['shortname']}**" in joined or f" {s['shortname']} " in joined or f"Also: {s['shortname']} " in joined
-    assert "DE2 jump\\_hulk\\_a4 1/24" in joined or "**DE2**" in joined
+            assert f"**{s['shortname']}**" in joined or f" {s['shortname']} {s['map']} ({s['players']}/" in joined
     menu = select(board)
     assert menu["custom_id"] == DETAILS_ID and len(menu["options"]) == 25
-    assert menu["options"][0]["label"] == "DE1 · jump_ataronchronon_b2" and menu["options"][0]["description"] == "4/24 · jump.tf (Frankfurt) Beginners"
-    assert t[-1].startswith("-# Data from [tempus2.xyz](https://tempus2.xyz)")
+    assert menu["options"][0]["label"] == "DE1 jump_ataronchronon_b2" and menu["options"][0]["description"] == "4/24 players, jump.tf (Frankfurt) Beginners"
+    assert t[-1] == "-# Data from [tempus2.xyz](https://tempus2.xyz). Pick a server below to see everyone on it."
 
     # nothing depends on the clock, and the footer's "last change" time doesn't count as a change
     again = render(servers, ranks, tiers, connect_url=CONNECT, usual=(61, "Fridays"))
@@ -183,14 +200,16 @@ def test_board_from_fixture() -> None:
 
     europe = render(servers, ranks, tiers, connect_url=CONNECT, region="Europe", usual=(40, "Fridays"))
     check_limits(europe)
-    assert texts(europe)[0].splitlines()[1:] == ["**32 players** on **17 servers** in Europe right now · 8 empty", "-# Usually around 40 players in Europe at this time on Fridays (UTC)"]
-    assert sum("**" in x and "/24" in x for x in texts(europe)) > sum("**" in x and "/24" in x and "🇩🇪" in x or "🇫🇷" in x for x in t if "Europe" in x)
+    assert texts(europe)[0].splitlines() == ["## Tempus jump servers in Europe", "**32 players** on **17 servers** in Europe right now, 8 empty",
+                                             "-# Usually around 40 players in Europe at this time on Fridays (UTC)"]
+    rows = lambda v: sum(1 for c in walk(v.to_components()) if c["type"] == 9)  # noqa: E731
+    assert rows(europe) > sum(1 for x in t if x.startswith(("🇩🇪", "🇫🇷", "🇫🇮", "🇷🇺", "🇬🇧")))
 
 
 def test_board_full_load_fits_discord_limits() -> None:
     servers, _ = parse_status(fixture("statusList.json"))
     tiers = tiers_from_fixture()
-    names = ["プレイヤーの名前がとても長い", "😀😀 emoji_name_long_long 😀", "Zalgo̶̢̧ n̷a̸m̵e̴ here long", "back`tick`name__**bold**", "x" * 32]
+    names = ["プレイヤーの名前がとても長い", "😀😀 emoji_name_long_long 😀", "Zalgo̶̢̧ n̷a̸m̵e̴ here long", "back`tick`name__**bold**", "x" * 40]
     ranks: Dict[int, Optional[int]] = {}
     for s in servers:
         s["users"] = [{"id": s["id"] * 100 + n, "name": f"{names[n % len(names)]}{n}"} for n in range(24)]
@@ -199,9 +218,10 @@ def test_board_full_load_fits_discord_limits() -> None:
         ranks.update({u["id"]: 100000 + u["id"] for u in s["users"][::2]})
     board = render(servers, ranks, tiers, connect_url=CONNECT, usual=(1500, "Saturdays"), stale_since=T)
     check_limits(board)
+    no_dots_or_escaped_labels(board)
     joined = "\n".join(texts(board))
     assert "**1416 players** on **59 servers**" in joined and "No answer from Tempus since <t:1800000000:R>" in joined
-    assert "more" in joined and "`" not in joined.replace("`connect", "")
+    assert "-# +20 more" in joined  # rows show 4 players, then the rest as a count
 
     # three times as many busy servers: the "Also" lines are cut short with "+N more"
     many = [dict(s, id=s["id"] + k * 1000, shortname=f"{s['shortname']}-{k}") for k in range(3) for s in servers]
@@ -209,18 +229,22 @@ def test_board_full_load_fits_discord_limits() -> None:
         s["players"] = 1 + i % 24
     board = render(many, ranks, tiers, connect_url=CONNECT)
     check_limits(board)
-    assert any("Also:" in x and x.rstrip().endswith("more") for x in texts(board))
+    assert any("-# Also " in x and x.rstrip().endswith("more") for x in texts(board))
 
 
 def test_board_rows_without_ip_and_details() -> None:
     s = {"id": 1, "shortname": "GBR3", "name": "jump.tf *London* All_Maps", "country": "United Kingdom", "region": "Europe", "online": True, "ip": None,
-         "host": "london.tempus2.xyz", "port": 27035, "map": "rj_unknown", "max_players": 24, "map_since": None, "players": 5,
-         "users": [{"id": 0, "name": "new`guy"}, {"id": 7, "name": "漢字の名前"}, {"id": 8, "name": "top"}, {"id": 9, "name": "unranked"}]}
-    board = render([s], {7: 2498, 8: 16, 9: None}, {}, connect_url=CONNECT)
+         "host": "london.tempus2.xyz", "port": 27035, "map": "rj_[odd]*map", "max_players": 24, "map_since": None, "players": 7,
+         "users": [{"id": 0, "name": "new`guy"}, {"id": 7, "name": "漢字の名前"}, {"id": 8, "name": "top"}, {"id": 9, "name": "unranked"},
+                   {"id": 10, "name": "five"}, {"id": 11, "name": "six"}]}
+    board = render([s], {7: 2498, 8: 16, 9: None, 10: 102681}, {}, connect_url=CONNECT)
     check_limits(board)
+    no_dots_or_escaped_labels(board)
     row = next(x for x in texts(board) if "**GBR3**" in x)
-    assert row.splitlines() == ["🇬🇧 **GBR3** · [rj\\_unknown](https://tempus2.xyz/maps/rj_unknown) · **5**/24",
-                                "top #16 · 漢字の名前 #2498 · new\\`guy · unranked · +1 more", "-# jump.tf \\*London\\* All\\_Maps"]
+    assert row.splitlines() == ["🇬🇧 **GBR3** jump.tf \\*London\\* All\\_Maps (7/24)",
+                                "[rj_(odd)∗map](https://tempus2.xyz/maps/rj_%5Bodd%5D%2Amap)",
+                                f"`{NB * 4}#16` top", f"`{NB * 2}#2498` 漢字の名前", f"`#102681` five", f"`{NB * 6}–` new\\`guy",
+                                "-# +3 more"]
     # no IP: the connect page can't take it, so the row links to the server's Tempus page
     assert [b["label"] for b in buttons(board)] == ["Info"] and buttons(board)[0]["url"] == "https://tempus2.xyz/servers/1"
 
@@ -228,12 +252,10 @@ def test_board_rows_without_ip_and_details() -> None:
         return render_details(s, {7: 2498, 8: 16}, {}, CONNECT)
     view = run(details())
     check_limits(view)
-    block = next(x for x in texts(view) if x.startswith("```"))
-    lines = block.strip("`\n").splitlines()
-    assert [ln.split()[0] for ln in lines] == ["top", "漢字の名前", "new'guy", "unranked", "+1"]
-    assert lines[0].endswith("    #16") and lines[1].endswith("  #2498") and lines[2].endswith(" " * 7)
-    # wide characters take two columns, so the rank column lines up
-    assert all(sum(2 if ord(c) > 0x2E80 else 1 for c in ln) == 26 for ln in lines[:4])
+    no_dots_or_escaped_labels(view)
+    players = next(x for x in texts(view) if x.startswith("`"))
+    lines = players.splitlines()
+    assert [ln.split("` ", 1)[1] for ln in lines[:-1]] == ["top", "漢字の名前", "five", "new\\`guy", "six", "unranked"] and lines[-1] == "-# +1 more"
     assert "Join from the TF2 console: `connect london.tempus2.xyz:27035`" in texts(view)
     assert [b["label"] for b in buttons(view)] == ["Map on Tempus", "Server on Tempus"]
     s["ip"] = "1.2.3.4"
@@ -406,12 +428,14 @@ def test_records_feed_selection() -> None:
     entries = records.flatten(fixture("activity.json"))
     assert len(entries) == 15 and {e["kind"] for e in entries} == set(records.KINDS) and all(e["zone_id"] for e in entries)
     newest = max(e["date"] for e in entries)
-    fresh = records.new_records(entries, set(), include_tops=False, now_ts=newest + 60)
+    newest_wr = max(e["date"] for e in entries if e["kind"] in records.WR_KINDS)
+    fresh = records.new_records(entries, set(), include_tops=False, now_ts=newest_wr + 60)
     assert fresh and all(r["kind"] in records.WR_KINDS for r in fresh)
     assert [r["date"] for r in fresh] == sorted(r["date"] for r in fresh)
     assert len(records.new_records(entries, set(), include_tops=True, now_ts=newest + 60)) >= len(fresh)
     assert not records.new_records(entries, {e["id"] for e in entries}, True, newest + 60)
-    assert not records.new_records(entries, set(), True, newest + 30 * 86400)  # too old to announce
+    assert not records.new_records(entries, set(), True, newest + 2 * 3600)  # set too long ago to announce
+    assert records.new_records(entries, set(), True, newest + 1800)
     assert records.flatten({"map_wrs": [{"junk": 1}], "trick_wrs": None}) == []
     assert records.fmt_time(65.985) == "1:05.985" and records.fmt_time(9.5) == "9.500" and records.fmt_time(3725.01) == "1:02:05.010"
     memory = records.wr_memory_rows(entries)
@@ -427,20 +451,21 @@ def test_record_embeds() -> None:
     wr = {"id": 8803077, "kind": "map_wrs", "class": 4, "duration": 65.985, "date": T, "server_id": 10, "rank": None, "zone_id": 10274,
           "player_id": 99892, "player": "geek_[x]", "map": "jump_lamia", "zone_type": "map", "zone_index": 1, "zone_name": ""}
     e = records.record_embed(wr, {}, {10: "AU2"}, previous=None, context=context)
-    assert e.title == "🏆 New map WR · jump_lamia" and e.url == "https://tempus2.xyz/maps/jump_lamia"
+    assert e.title == "🏆 New map WR on jump_lamia" and e.url == "https://tempus2.xyz/maps/jump_lamia"
     second = context["second"]["player"]
-    assert e.description == f"🇦🇺 **[geek\\_(x)](https://tempus2.xyz/players/99892)** · Demoman · **1:05.985**\n**0.525 s** ahead of #2 {second}"
-    assert e.footer.text == "Tier 5 · 268 demoman completions · set on AU2" and e.timestamp is not None
+    # no backslashes inside the link label: Discord would show them
+    assert e.description == f"🇦🇺 **[geek_(x)](https://tempus2.xyz/players/99892)** as Demoman in **1:05.985**\n**0.525 s** ahead of #2 {second}\n-# set <t:1800000000:R>"
+    assert e.footer.text == "Tier 5, 268 demoman completions, set on AU2" and e.timestamp is not None
 
     old = {"record_id": 1, "player_id": 42, "player": "Farma", "duration": 66.516}
-    assert records.record_embed(wr, {}, {}, previous=old, context={}).description.endswith("Beats the old WR by **0.531 s** (Farma, 1:06.516)")
+    assert records.record_embed(wr, {}, {}, previous=old, context={}).description.splitlines()[1] == "Beats the old WR by **0.531 s** (Farma, 1:06.516)"
     own = dict(old, player_id=99892)
-    assert records.record_embed(wr, {}, {}, previous=own).description.endswith("Improves their own WR by **0.531 s**")
+    assert records.record_embed(wr, {}, {}, previous=own).description.splitlines()[1] == "Improves their own WR by **0.531 s**"
     first = records.record_embed(wr, {}, {}, context={"completions": 1})
-    assert first.description.endswith("First completion") and first.footer.text == "1 demoman completion"
+    assert first.description.splitlines()[1] == "First completion" and first.footer.text == "1 demoman completion"
 
     bonus = dict(wr, kind="bonus_wrs", zone_type="bonus", zone_index=2)
-    assert records.record_embed(bonus, {}, {}).title == "⭐ New bonus WR · jump_lamia · Bonus 2"
+    assert records.record_embed(bonus, {}, {}).title == "⭐ New bonus WR on jump_lamia, Bonus 2"
     top = dict(wr, kind="map_tops", rank=4)
     assert records.record_embed(top, {"jump_lamia": (2, 5)}, {}).title == "🎖️ #4 on jump_lamia"
     assert records.record_embed(top, {"jump_lamia": (2, 5)}, {}).footer.text == "Tier 5"
@@ -660,7 +685,7 @@ def test_records_posted_once_with_what_they_beat() -> None:
             await cog.on_activity(activity)
             assert len(feed.sent) == 1 and len(feed.sent[0]) == 1 and len(client.calls) == 1
             embed = feed.sent[0][0]
-            assert embed.title.startswith("🏆 New map WR · ") and "newcomer" in embed.description
+            assert embed.title.startswith("🏆 New map WR on ") and "newcomer" in embed.description and "·" not in embed.description
             assert f"Beats the old WR by **0.500 s** ({old['player_info']['name']}" in embed.description
             assert client.calls[0] == f"zones/id/{old['record_info']['zone_id']}/records/list?limit=3"
             # the new WR is now the one to beat
@@ -672,7 +697,7 @@ def test_records_posted_once_with_what_they_beat() -> None:
 
 def test_list_messages_stay_within_discord_limits() -> None:
     from tempus.cog import list_messages
-    lines = [f"**Player {i}** · [jump_map_{i}](https://tempus2.xyz/maps/jump_map_{i}) · `connect 1.2.3.4:27015`" for i in range(300)]
+    lines = [f"**Player {i}**, [jump_map_{i}](https://tempus2.xyz/maps/jump_map_{i}), `connect 1.2.3.4:27015`" for i in range(300)]
     messages = list_messages("300 players matching \"p\"", lines)
     shown = "\n".join(e.description for m in messages for e in m)
     assert all(f"**Player {i}**" in shown for i in range(300))

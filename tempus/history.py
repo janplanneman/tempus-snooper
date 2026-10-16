@@ -14,7 +14,7 @@ DAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 DAY_NAMES = ("Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays")
 # at least this many different days before a (day, hour) average is shown
 MIN_DAYS = 2
-SHADES = "·░▒▓█"
+SHADES = "-░▒▓█"
 
 
 def local(ts: float) -> datetime:

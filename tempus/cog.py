@@ -9,10 +9,10 @@ from discord import app_commands
 from discord.ext import commands
 
 from . import history, records
-from .board import BOARD_COLOUR, DETAILS_ID, Board, connect_command, connect_url_for, esc, footer_text, map_link, plural, render_board, render_details
+from .board import BOARD_COLOUR, DETAILS_ID, Board, connect_command, connect_url_for, esc, footer_text, map_link, plural, rank_tag, render_board, render_details
 from .config import Config
 from .ranks import RankService
-from .regions import REGIONS
+from .regions import REGIONS, flag
 from .storage import Storage
 from .tempus_client import NotFound, TempusClient
 from .tracker import Tracker, now
@@ -337,13 +337,10 @@ class ServersCog(commands.Cog):
         ranks = self.ranks.known(u["id"] for u, _ in found)
         lines = []
         for u, s in found[:WHERE_MAX]:
-            rank = f" (#{ranks[u['id']]})" if ranks.get(u["id"]) else ""
-            parts = [f"**{esc(u['name'] or '(unnamed)')}**{rank}", f"**{esc(s['shortname'])}** {esc(s['name'])}", map_link(s.get("map"))]
             url = connect_url_for(s, self.cfg.connect_url)
-            c = f"[Connect]({url})" if url else connect_command(s)
-            if c:
-                parts.append(c)
-            lines.append(" · ".join(parts))
+            join = f", [Join]({url})" if url else (f", {connect_command(s)}" if connect_command(s) else "")
+            lines.append(f"{rank_tag(ranks.get(u['id']))} **{esc(u['name'] or '(unnamed)')}** is on {flag(s.get('country'))} **{esc(s['shortname'])}** "
+                         f"{esc(s['name'])}, {map_link(s.get('map'))}{join}")
         if len(found) > WHERE_MAX:
             lines.append(f"…and {len(found) - WHERE_MAX} more. Try more of the name.")
         stale = self.tracker.stale_since()
@@ -373,7 +370,7 @@ class ServersCog(commands.Cog):
         embed.description = f"Average players online{f' in {r}' if r else ''}, last 8 weeks (hours in UTC)\n```\n" + "\n".join(history.chart(cells)) + "\n```" + history.legend(cells)
         top = history.busiest(cells)
         if top:
-            embed.add_field(name="Busiest", value="\n".join(f"{history.DAYS[d]} {h:02d}:00 UTC · about {plural(round(v), 'player')}" for d, h, v in top), inline=True)
+            embed.add_field(name="Busiest", value="\n".join(f"{history.DAYS[d]} {h:02d}:00 UTC, about {plural(round(v), 'player')}" for d, h, v in top), inline=True)
         best = history.record(await self.store.snapshots_since(0, r))
         if best:
             embed.add_field(name="Record", value=f"{plural(best[0], 'player')}\n{_ts(best[1], 'f')}", inline=True)
@@ -403,7 +400,7 @@ class ServersCog(commands.Cog):
         st = self.client.stats()
         embed = discord.Embed(title="Tempus Snooper status", colour=discord.Colour.blurple())
         embed.add_field(name="Poll health", value=health, inline=False)
-        embed.add_field(name="Servers", value=f"{c.get('visible', 0)} visible, {c.get('offline', 0)} offline\n{c.get('hidden', 0)} hidden · {c.get('bad', 0)} unreadable\n{len(busy)} busy, {sum(s['players'] for s in busy)} players", inline=True)
+        embed.add_field(name="Servers", value=f"{c.get('visible', 0)} visible, {c.get('offline', 0)} offline\n{c.get('hidden', 0)} hidden, {c.get('bad', 0)} unreadable\n{len(busy)} busy, {sum(s['players'] for s in busy)} players", inline=True)
         embed.add_field(name="Ranks", value=f"{len(self.ranks)} cached\n{self.ranks.queued} queued\n{self.ranks.lookups} looked up, {self.ranks.failures} failed since start", inline=True)
         api = f"{st['requests_hour']} requests\n{st['rate_limited_hour']} × 429 ({st['rate_limited_total']} since start)\n{st['errors_hour']} errors"
         if st["last_error"]:

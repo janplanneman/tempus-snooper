@@ -15,7 +15,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import discord
 
-from .board import esc, map_url
+from .board import esc, link_label, map_url
 from .regions import NO_FLAG, flag
 from .tracker import _int, clean_name
 
@@ -28,8 +28,8 @@ COLOURS = {"map_wrs": 0xF1C40F, "course_wrs": 0xE67E22, "bonus_wrs": 0x9B59B6, "
 CLASSES = {3: "Soldier", 4: "Demoman"}
 CLASS_KEYS = {3: "soldier", 4: "demoman"}
 PLAYER_URL = "https://tempus2.xyz/players/{}"
-# records older than this when first seen (e.g. after the bot was down) aren't posted
-MAX_AGE_S = 24 * 3600
+# records set longer ago than this when the bot first sees them (e.g. after it was down) aren't posted
+MAX_AGE_S = 3600
 
 
 def flatten(data: Any) -> List[Dict[str, Any]]:
@@ -114,7 +114,7 @@ def _title(r: Dict[str, Any]) -> str:
     if r["kind"] == "map_tops":
         return f"🎖️ #{r['rank']} on {where}" if r.get("rank") else f"🎖️ Top 10 time on {where}"
     icon = "🏆" if r["kind"] == "map_wrs" else "⭐"
-    return f"{icon} New {KINDS[r['kind']].replace(' WR', '').lower()} WR · {where}" + (f" · {zone}" if zone else "")
+    return f"{icon} New {KINDS[r['kind']].replace(' WR', '').lower()} WR on {where}" + (f", {zone}" if zone else "")
 
 
 def _beat_line(r: Dict[str, Any], previous: Optional[Dict[str, Any]], context: Dict[str, Any]) -> Optional[str]:
@@ -137,16 +137,16 @@ def record_embed(r: Dict[str, Any], tiers: Dict[str, Tuple[Optional[int], Option
     url = map_url(r["map"]) if r.get("map") else None
     embed = discord.Embed(title=_title(r)[:256], url=url, colour=COLOURS[r["kind"]])
     pid = r.get("player_id")
-    who = esc(r["player"])
-    if pid:
-        who = f"[{who.replace('[', '(').replace(']', ')')}]({PLAYER_URL.format(pid)})"
+    who = f"[{link_label(r['player'])}]({PLAYER_URL.format(pid)})" if pid else esc(r["player"])
     holder_flag = flag(code=context.get("country_code")) if context.get("country_code") else ""
-    first = f"{holder_flag + ' ' if holder_flag and holder_flag != NO_FLAG else ''}**{who}** · {CLASSES.get(r.get('class') or 0, '?')} · **{fmt_time(r['duration'])}**"
+    first = f"{holder_flag + ' ' if holder_flag and holder_flag != NO_FLAG else ''}**{who}** as {CLASSES.get(r.get('class') or 0, '?')} in **{fmt_time(r['duration'])}**"
     lines = [first]
     if r["kind"] in WR_KINDS:
         beat = _beat_line(r, previous, context)
         if beat:
             lines.append(beat)
+    if r.get("date"):
+        lines.append(f"-# set <t:{int(r['date'])}:R>")
     embed.description = "\n".join(lines)
     footer = []
     tier = context.get("tier")
@@ -161,7 +161,7 @@ def record_embed(r: Dict[str, Any], tiers: Dict[str, Tuple[Optional[int], Option
     if server:
         footer.append(f"set on {server}")
     if footer:
-        embed.set_footer(text=" · ".join(footer))
+        embed.set_footer(text=", ".join(footer))
     if r.get("date"):
         embed.timestamp = datetime.fromtimestamp(r["date"], tz=timezone.utc)
     return embed
