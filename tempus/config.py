@@ -63,7 +63,7 @@ class Config:
     # also post new top-10 map times, not only world records
     records_include_tops: bool = False
     # page that opens steam://connect/<addr> (Discord won't link steam:// itself); empty hides the links
-    connect_url: Optional[str] = "https://tf2sa-clips.co.za/connect#{addr}"
+    connect_url: Optional[str] = "https://janplanneman.github.io/tempus-snooper/connect/#{addr}"
     admin_user_ids: Tuple[int, ...] = ()
     # who to contact about the bot, sent to Tempus in the User-Agent
     contact: Optional[str] = None
@@ -102,7 +102,7 @@ def load_config(env_file: Optional[str] = None) -> Config:
         status_channel_name=(_str("STATUS_CHANNEL_NAME", "tempus-status") or "tempus-status").lstrip("#"),
         records_channel_name=records or None,
         records_include_tops=_bool("RECORDS_INCLUDE_TOPS", False),
-        connect_url=os.getenv("CONNECT_URL", "https://tf2sa-clips.co.za/connect#{addr}").strip() or None,
+        connect_url=os.getenv("CONNECT_URL", "https://janplanneman.github.io/tempus-snooper/connect/#{addr}").strip() or None,
         admin_user_ids=admin_ids,
         contact=_str("CONTACT"),
         poll_interval_s=_int("POLL_INTERVAL_SECONDS", 30),
