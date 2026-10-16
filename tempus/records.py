@@ -80,9 +80,28 @@ def leaderboard_context(data: Any, cls: Optional[int]) -> Dict[str, Any]:
         info = row.get("player_info") or {}
         if row.get("rank") == 1:
             out["country_code"] = info.get("country_code")
+            demo = row.get("demo_info") if isinstance(row.get("demo_info"), dict) else {}
+            if demo.get("url"):
+                out["demo"] = {"url": demo["url"], "start_tick": _int(demo.get("start_tick")), "record_id": _int(row.get("id"))}
         elif row.get("rank") == 2:
             out["second"] = {"player": clean_name(row.get("name") or info.get("name")) or "?", "duration": float(row["duration"])}
     return out
+
+
+def demo_from_overview(data: Any) -> Optional[Dict[str, Any]]:
+    """From records/id/{id}/overview: the run's demo once the server has uploaded it (often an hour after the run,
+    when its recording ends), or None while it isn't there yet or has expired."""
+    data = data if isinstance(data, dict) else {}
+    demo = data.get("demo_info") if isinstance(data.get("demo_info"), dict) else {}
+    info = data.get("record_info") if isinstance(data.get("record_info"), dict) else {}
+    if not demo.get("url") or demo.get("expired") or demo.get("deleted"):
+        return None
+    return {"url": demo["url"], "start_tick": _int(info.get("demo_start_tick"))}
+
+
+def demo_line(demo: Dict[str, Any]) -> str:
+    tick = f", the run starts at tick {demo['start_tick']}" if demo.get("start_tick") else ""
+    return f"[Download demo]({demo['url']}){tick}"
 
 
 def fmt_time(seconds: float) -> str:
@@ -132,8 +151,11 @@ def _beat_line(r: Dict[str, Any], previous: Optional[Dict[str, Any]], context: D
 
 
 def record_embed(r: Dict[str, Any], tiers: Dict[str, Tuple[Optional[int], Optional[int]]], server_names: Dict[int, str],
-                 previous: Optional[Dict[str, Any]] = None, context: Optional[Dict[str, Any]] = None) -> discord.Embed:
+                 previous: Optional[Dict[str, Any]] = None, context: Optional[Dict[str, Any]] = None, demo: Optional[Dict[str, Any]] = None) -> discord.Embed:
     context = context or {}
+    # the leaderboard's #1 is this record unless someone beat it in the minutes before the lookup
+    if demo is None and (context.get("demo") or {}).get("record_id") == r["id"]:
+        demo = context["demo"]
     url = map_url(r["map"]) if r.get("map") else None
     embed = discord.Embed(title=_title(r)[:256], url=url, colour=COLOURS[r["kind"]])
     pid = r.get("player_id")
@@ -145,6 +167,8 @@ def record_embed(r: Dict[str, Any], tiers: Dict[str, Tuple[Optional[int], Option
         beat = _beat_line(r, previous, context)
         if beat:
             lines.append(beat)
+    if demo:
+        lines.append(demo_line(demo))
     if r.get("date"):
         lines.append(f"-# set <t:{int(r['date'])}:R>")
     embed.description = "\n".join(lines)
@@ -175,3 +199,27 @@ def wr_memory_rows(entries: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
             best[(r["zone_id"], r["class"])] = {"zone_id": r["zone_id"], "class": r["class"], "record_id": r["id"], "player_id": r.get("player_id"),
                                                 "player": r["player"], "duration": r["duration"], "date": r["date"]}
     return list(best.values())
+
+
+ZONE_KINDS = ("course", "bonus", "trick")
+
+
+def _count(n: int, word: str) -> str:
+    return f"{n} {word if n == 1 else word + ('es' if word.endswith('s') else 's')}"
+
+
+def new_map_embed(m: Dict[str, Any]) -> discord.Embed:
+    """A map Tempus just added: tiers, authors and its extra zones."""
+    embed = discord.Embed(title=f"🗺️ New map on Tempus: {m['name']}"[:256], url=map_url(m["name"]), colour=0x27AE60)
+    lines = []
+    tiers = ", ".join(f"T{t} {cls}" for t, cls in ((m.get("tier_soldier"), "soldier"), (m.get("tier_demoman"), "demo")) if t)
+    if tiers:
+        lines.append(tiers)
+    counts = m.get("zone_counts") or {}
+    zones = [_count(counts[kind], kind) for kind in ZONE_KINDS if isinstance(counts.get(kind), int) and counts[kind] > 0]
+    if zones:
+        lines.append(", ".join(zones))
+    if m.get("authors"):
+        lines.append(f"-# by {esc(', '.join(m['authors'][:6]))}" + (f" and {len(m['authors']) - 6} more" if len(m["authors"]) > 6 else ""))
+    embed.description = "\n".join(lines) or None
+    return embed

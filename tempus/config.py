@@ -62,6 +62,10 @@ class Config:
     records_channel_name: Optional[str] = "tempus-records"
     # also post new top-10 map times, not only world records
     records_include_tops: bool = False
+    # servers going offline (and the Tempus API not answering) are posted in every server with this channel; None turns it off
+    alerts_channel_name: Optional[str] = "tempus-alerts"
+    # how long a server must be offline before it's reported, so a map change or quick restart isn't
+    offline_alert_s: int = 300
     # page that opens steam://connect/<addr> (Discord won't link steam:// itself); empty hides the links
     connect_url: Optional[str] = "https://janplanneman.github.io/tempus-snooper/connect/#{addr}"
     admin_user_ids: Tuple[int, ...] = ()
@@ -70,7 +74,8 @@ class Config:
 
     # statusList changes on most 15 s polls (measured 2026-10-16), so polling faster only shows the same churn sooner
     poll_interval_s: int = 30
-    maps_refresh_s: int = 24 * 3600
+    # also how quickly new maps are announced
+    maps_refresh_s: int = 6 * 3600
     activity_interval_s: int = 300
     # rank lookups are one request per player; they share the 1 request/s budget with everything else
     rank_ttl_s: int = 24 * 3600
@@ -95,6 +100,7 @@ def load_config(env_file: Optional[str] = None) -> Config:
     load_dotenv(env_file)
     admin_ids = tuple(int(x) for x in _csv("ADMIN_USER_IDS") if x.isdigit())
     records = os.getenv("RECORDS_CHANNEL_NAME", "tempus-records").strip().lstrip("#")
+    alerts = os.getenv("ALERTS_CHANNEL_NAME", "tempus-alerts").strip().lstrip("#")
     cfg = Config(
         discord_token=_str("DISCORD_TOKEN", required=True),
         guild_id=_int("GUILD_ID", None),
@@ -102,11 +108,13 @@ def load_config(env_file: Optional[str] = None) -> Config:
         status_channel_name=(_str("STATUS_CHANNEL_NAME", "tempus-status") or "tempus-status").lstrip("#"),
         records_channel_name=records or None,
         records_include_tops=_bool("RECORDS_INCLUDE_TOPS", False),
+        alerts_channel_name=alerts or None,
+        offline_alert_s=_int("OFFLINE_ALERT_MINUTES", 5) * 60,
         connect_url=os.getenv("CONNECT_URL", "https://janplanneman.github.io/tempus-snooper/connect/#{addr}").strip() or None,
         admin_user_ids=admin_ids,
         contact=_str("CONTACT"),
         poll_interval_s=_int("POLL_INTERVAL_SECONDS", 30),
-        maps_refresh_s=_int("MAPS_REFRESH_HOURS", 24) * 3600,
+        maps_refresh_s=_int("MAPS_REFRESH_HOURS", 6) * 3600,
         activity_interval_s=_int("ACTIVITY_INTERVAL_MINUTES", 5) * 60,
         rank_ttl_s=_int("RANK_TTL_HOURS", 24) * 3600,
         rank_lookup_interval_s=_float("RANK_LOOKUP_SECONDS", 2.0),

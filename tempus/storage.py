@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -91,6 +92,30 @@ class Storage:
             "duration = excluded.duration, date = excluded.date WHERE excluded.date >= COALESCE(wrs.date, 0)",
             rows,
         )
+        await self._db.commit()
+
+    async def add_pending_demo(self, record_id: int, post: Dict[str, Any], messages: List[Tuple[int, int]], next_check: float) -> None:
+        await self._db.execute("INSERT OR REPLACE INTO pending_demos (record_id, post, messages, attempts, next_check) VALUES (?, ?, ?, 0, ?)",
+                               (record_id, json.dumps(post), json.dumps(messages), next_check))
+        await self._db.commit()
+
+    async def due_pending_demos(self, now: float, limit: int) -> List[Dict[str, Any]]:
+        async with self._db.execute("SELECT * FROM pending_demos WHERE next_check <= ? ORDER BY next_check LIMIT ?", (now, limit)) as cur:
+            rows = [dict(r) for r in await cur.fetchall()]
+        for r in rows:
+            r["post"], r["messages"] = json.loads(r["post"]), json.loads(r["messages"])
+        return rows
+
+    async def pending_demo_count(self) -> int:
+        async with self._db.execute("SELECT COUNT(*) FROM pending_demos") as cur:
+            return (await cur.fetchone())[0]
+
+    async def retry_pending_demo(self, record_id: int, attempts: int, next_check: float) -> None:
+        await self._db.execute("UPDATE pending_demos SET attempts = ?, next_check = ? WHERE record_id = ?", (attempts, next_check, record_id))
+        await self._db.commit()
+
+    async def delete_pending_demo(self, record_id: int) -> None:
+        await self._db.execute("DELETE FROM pending_demos WHERE record_id = ?", (record_id,))
         await self._db.commit()
 
     async def record_snapshot(self, ts: float, servers: Sequence[Dict[str, Any]]) -> None:

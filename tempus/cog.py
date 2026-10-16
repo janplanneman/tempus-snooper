@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import socket
 from typing import Any, Dict, List, Optional, Tuple
@@ -8,7 +9,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from . import history, records
+from . import alerts, history, records
 from .board import BOARD_COLOUR, DETAILS_ID, Board, connect_command, connect_url_for, esc, footer_text, map_link, plural, rank_tag, render_board, render_details
 from .config import Config
 from .ranks import RankService
@@ -28,6 +29,10 @@ BOARD_FORMAT = "2"
 # leaderboard lookups for WR posts per activity check; the rest are posted without "what it beat"
 MAX_WR_LOOKUPS = 10
 EPHEMERAL_VIEW_TIMEOUT = 600
+# a new WR's demo is usually uploaded when the server's recording ends, often an hour later: look again after
+# these delays (seconds after the post, then after each check), then give up
+DEMO_CHECKS = (600, 1200, 2400, 4800, 9600, 19200)
+DEMO_CHECKS_PER_RUN = 5
 
 
 def _ts(t: Optional[float], style: str = "R") -> str:
@@ -72,9 +77,11 @@ class ServersCog(commands.Cog):
         self._last_prune = 0.0
         self._last_records_prune = 0.0
         self._usual: Dict[Optional[str], Tuple[float, Optional[Tuple[int, str]]]] = {}
+        self._alerts: Optional[Dict[str, Any]] = None
         tracker.after_cycle = self.update_board
         if cfg.records_channel_name:
             tracker.on_activity = self.on_activity
+            tracker.on_new_maps = self.on_new_maps
 
     def _is_admin(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id in self.cfg.admin_user_ids:
@@ -171,6 +178,10 @@ class ServersCog(commands.Cog):
             await self._record_history()
         except Exception:
             log.exception("Could not record a history snapshot")
+        try:
+            await self._check_alerts()
+        except Exception:
+            log.exception("Could not check for server alerts")
         if not self.bot.is_ready():
             return
         board = await self.build_board()
@@ -231,6 +242,27 @@ class ServersCog(commands.Cog):
         self._ok(guild, "board")
         log.info("Posted a new status board in #%s (%s)", channel.name, guild.name)
 
+    async def _post(self, channel_name: Optional[str], what: str, embeds: List[discord.Embed]) -> List[Tuple[int, int]]:
+        """Post to the channel with this name in every server that has one; up to 10 embeds per message.
+        Returns (channel id, message id) for each message sent."""
+        sent: List[Tuple[int, int]] = []
+        if not channel_name or not embeds or not self.bot.is_ready():
+            return sent
+        for guild in list(self.bot.guilds):
+            channel = discord.utils.get(guild.text_channels, name=channel_name)
+            if channel is None or self._missing_perms(guild, channel, what):
+                continue
+            try:
+                for i in range(0, len(embeds), 10):
+                    msg = await channel.send(embeds=embeds[i:i + 10])
+                    sent.append((channel.id, msg.id))
+                self._ok(guild, what)
+            except discord.HTTPException as e:
+                self._warn_once(f"{guild.id}:{what}:send", "Could not post %s in %s: %s", what, guild.name, e)
+            except Exception:
+                log.exception("Could not post %s in %s", what, guild.name)
+        return sent
+
     async def on_activity(self, data: Any) -> None:
         entries = records.flatten(data)
         t = now()
@@ -248,21 +280,22 @@ class ServersCog(commands.Cog):
         if t - self._last_records_prune > 86400:
             self._last_records_prune = t
             await self.store.prune_seen_records(t - SEEN_RECORDS_KEEP_S)
-        embeds = await self._record_embeds(fresh) if fresh and self.bot.is_ready() else []
+        posts = await self._record_posts(fresh) if fresh and self.bot.is_ready() else []
         # after the posts have used the old WRs
         await self.store.save_wrs(records.wr_memory_rows(entries))
-        if not embeds:
-            return
-        log.info("Posting %d new records", len(embeds))
-        for guild in list(self.bot.guilds):
-            try:
-                await self._post_records(guild, embeds)
-            except Exception:
-                log.exception("Could not post records in %s", guild.name)
+        if posts:
+            log.info("Posting %d new records", len(posts))
+        for p in posts:
+            # one message per record, so it can be edited when its demo turns up
+            messages = await self._post(self.cfg.records_channel_name, "records", [self._record_embed(p)])
+            if messages and p["record"]["kind"] in records.WR_KINDS and not p["demo"]:
+                await self.store.add_pending_demo(p["record"]["id"], p, messages, t + DEMO_CHECKS[0])
+        await self._check_demos()
 
-    async def _record_embeds(self, fresh: List[Dict[str, Any]]) -> List[discord.Embed]:
+    async def _record_posts(self, fresh: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """What each new record's post is built from: kept as JSON, so the post can be rebuilt with its demo later."""
         names = {s["id"]: s["shortname"] for s in self.tracker.servers}
-        embeds = []
+        posts = []
         lookups = 0
         for r in fresh:
             previous: Optional[Dict[str, Any]] = None
@@ -279,21 +312,86 @@ class ServersCog(commands.Cog):
                         log.warning("Could not read the leaderboard of zone %s: %s", r["zone_id"], e)
                 # two WRs on one zone in the same check: the second beats the first
                 await self.store.save_wrs(records.wr_memory_rows([r]))
-            embeds.append(records.record_embed(r, self.tracker.tiers, names, previous, context))
-        return embeds
+            demo = context.get("demo") if (context.get("demo") or {}).get("record_id") == r["id"] else None
+            posts.append({"record": r, "previous": previous, "context": context, "server": names.get(r.get("server_id") or -1), "demo": demo})
+        return posts
 
-    async def _post_records(self, guild: discord.Guild, embeds: List[discord.Embed]) -> None:
-        channel = discord.utils.get(guild.text_channels, name=self.cfg.records_channel_name)
-        if channel is None or self._missing_perms(guild, channel, "records"):
+    def _record_embed(self, post: Dict[str, Any]) -> discord.Embed:
+        r = post["record"]
+        names = {r["server_id"]: post["server"]} if post.get("server") and r.get("server_id") else {}
+        return records.record_embed(r, self.tracker.tiers, names, post.get("previous"), post.get("context"), post.get("demo"))
+
+    async def _check_demos(self) -> None:
+        """WR posts whose demo wasn't uploaded yet: look again on a backoff and edit the posts once it's there."""
+        if not self.bot.is_ready():
             return
-        # up to 10 embeds per message; a record embed is a few hundred characters, far below the 6000 limit
-        for i in range(0, len(embeds), 10):
+        for p in await self.store.due_pending_demos(now(), DEMO_CHECKS_PER_RUN):
+            rid = p["record_id"]
             try:
-                await channel.send(embeds=embeds[i:i + 10])
-            except discord.HTTPException as e:
-                self._warn_once(f"{guild.id}:records:send", "Could not post records in %s: %s", guild.name, e)
-                return
-        self._ok(guild, "records")
+                demo = records.demo_from_overview(await self.client.get(f"records/id/{rid}/overview"))
+            except NotFound:
+                await self.store.delete_pending_demo(rid)
+                continue
+            except Exception as e:
+                log.warning("Could not check the demo of record %s: %s", rid, e)
+                demo = None
+            if not demo:
+                attempts = p["attempts"] + 1
+                if attempts >= len(DEMO_CHECKS):
+                    await self.store.delete_pending_demo(rid)
+                else:
+                    await self.store.retry_pending_demo(rid, attempts, now() + DEMO_CHECKS[attempts])
+                continue
+            post = dict(p["post"], demo=demo)
+            embed = self._record_embed(post)
+            for channel_id, message_id in p["messages"]:
+                channel = self.bot.get_channel(channel_id)
+                if channel is None:
+                    continue
+                try:
+                    await channel.get_partial_message(message_id).edit(embed=embed)
+                except discord.HTTPException as e:
+                    log.info("Could not add the demo to record post %s: %s", message_id, e)
+            await self.store.delete_pending_demo(rid)
+            log.info("Added the demo to the post of record %s", rid)
+
+    async def on_new_maps(self, maps: List[Dict[str, Any]]) -> None:
+        log.info("New maps on Tempus: %s", ", ".join(m["name"] for m in maps))
+        await self._post(self.cfg.records_channel_name, "records", [records.new_map_embed(m) for m in maps])
+
+    async def _alert_state_loaded(self) -> Dict[str, Any]:
+        if self._alerts is None:
+            saved = await self.store.kv_get("alert_state")
+            self._alerts = json.loads(saved) if saved else {}
+        return self._alerts
+
+    async def _check_alerts(self) -> None:
+        """Servers that went offline (or came back), and the Tempus API not answering, to the alerts channel."""
+        if not self.cfg.alerts_channel_name or not self.bot.is_ready():
+            return
+        state = await self._alert_state_loaded()
+        before = json.dumps(state, sort_keys=True)
+        t = now()
+        embeds: List[discord.Embed] = []
+        last_ok = self.tracker.updated_at or self.tracker.health.get("started_at") or t
+        api = state.get("api")
+        if t - last_ok > max(self.cfg.offline_alert_s, 3 * self.cfg.poll_interval_s):
+            if not api:
+                embeds.append(alerts.api_embed(True, last_ok, t))
+                state["api"] = {"since": last_ok}
+        else:
+            if api:
+                embeds.append(alerts.api_embed(False, api["since"], t))
+                state.pop("api")
+            # server status is only known from a poll that worked
+            if self.tracker.health.get("last_cycle_ok"):
+                state["servers"], events = alerts.check_servers(state.get("servers", {}), self.tracker.servers, t, self.cfg.offline_alert_s)
+                embeds += [alerts.server_embed(e) for e in events]
+                for e in events:
+                    log.info("Server %s is %s", e["server"]["shortname"], "offline" if e["kind"] == "down" else "back online")
+        if json.dumps(state, sort_keys=True) != before:
+            await self.store.kv_set("alert_state", json.dumps(state))
+        await self._post(self.cfg.alerts_channel_name, "alerts", embeds)
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction) -> None:
@@ -408,8 +506,12 @@ class ServersCog(commands.Cog):
         embed.add_field(name="Tempus API (last hour)", value=api, inline=True)
         first = await self.store.first_snapshot()
         embed.add_field(name="Data", value=f"{len(self.tracker.tiers)} maps, read {_ts(self.tracker.maps_at)}\n{await self.store.snapshot_count()} history snapshots since {_ts(first, 'd') if first else 'never'}", inline=True)
-        feed = f"#{self.cfg.records_channel_name}, checked {_ts(self.tracker.activity_at)}" if self.cfg.records_channel_name else "off"
+        feed = f"#{self.cfg.records_channel_name}, checked {_ts(self.tracker.activity_at)}\n{await self.store.pending_demo_count()} posts waiting for a demo" if self.cfg.records_channel_name else "off"
         embed.add_field(name="Records feed", value=feed, inline=True)
+        offline = [s["shortname"] for s in self.tracker.servers if not s["online"]]
+        if self.cfg.alerts_channel_name:
+            down = esc(", ".join(offline)) if offline else "none"
+            embed.add_field(name="Alerts", value=f"#{self.cfg.alerts_channel_name}, after {self.cfg.offline_alert_s // 60} min offline\nOffline now: {down}"[:1024], inline=True)
         embed.set_footer(text=f"Running on {socket.gethostname()}")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

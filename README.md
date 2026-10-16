@@ -2,7 +2,7 @@
 
 A Discord bot that shows who is playing on the [Tempus](https://tempus2.xyz) TF2 rocket and sticky jump servers, worldwide.
 
-It keeps one panel in your `#tempus-status` channel up to date: how many players are on how many servers, what's usual for this day and hour, and the busy servers grouped by region. Each server row shows its flag, map, soldier and demoman tiers, player count and best-ranked players, with a **Join** button. A menu under the panel opens any server's full player list privately. New world records are posted in `#tempus-records`, with whose record they beat and by how much.
+It keeps one panel in your `#tempus-status` channel up to date: how many players are on how many servers, what's usual for this day and hour, and the busy servers grouped by region. Each server row shows its flag, map, soldier and demoman tiers, player count and best-ranked players, with a **Join** button. A menu under the panel opens any server's full player list privately. New world records are posted in `#tempus-records`, with whose record they beat, by how much, and a link to the demo, along with maps Tempus adds. Servers that go offline are reported in `#tempus-alerts`.
 
 ## How it works
 
@@ -37,7 +37,7 @@ Invite the bot with the `bot` and `applications.commands` scopes, plus the permi
 https://discord.com/oauth2/authorize?client_id=<APP_ID>&scope=bot+applications.commands&permissions=19456
 ```
 
-Create a text channel called `#tempus-status` (and `#tempus-records` for the record feed), then start the bot. Every Discord server the bot is in that has those channels gets its own board and feed. If the bot is missing permissions there, it keeps retrying until it has them.
+Create a text channel called `#tempus-status`, plus `#tempus-records` for the record feed and `#tempus-alerts` for server alerts if you want them, then start the bot. Every Discord server the bot is in that has those channels gets its own board and feeds. If the bot is missing permissions there, it keeps retrying until it has them.
 
 ```bash
 python bot.py
@@ -57,9 +57,12 @@ python bot.py
 - **One copy per token:** two copies of the bot on the same token edit the same board in turn and it flickers. The host name is in the log at startup and in `/status`.
 - **"Usually around N players":** this appears once the same weekday and hour has data from 2 earlier days, so after about a week. Time the bot is offline leaves gaps that push it back.
 - **Map times:** "started 23 minutes ago" only shows once the bot has seen the map change. After a restart it's back on the next map change.
-- **Record feed:** posts new map, course, bonus and trick world records. Set `RECORDS_INCLUDE_TOPS=true` to add top-10 map times, or leave `RECORDS_CHANNEL_NAME` empty to turn it off. Records already in the feed when the bot first starts aren't posted.
+- **Record feed:** posts new map, course, bonus and trick world records. Set `RECORDS_INCLUDE_TOPS=true` to add top-10 map times, or leave `RECORDS_CHANNEL_NAME` empty to turn it off. Records already in the feed when the bot first starts aren't posted, and nor is anything set more than an hour before the bot sees it (after downtime, say).
 - **Join buttons:** Discord only allows `http(s)` links on buttons (it rejects `steam://`), so Join opens a small page that starts TF2: `CONNECT_URL`, with `{addr}` replaced by `ip:port`. The page is `docs/connect/`, published with GitHub Pages at <https://janplanneman.github.io/tempus-snooper/connect/> (the default). To host it elsewhere, copy that one file and change `CONNECT_URL`. It only accepts a plain `ip:port`, so it can't send people anywhere else. A server without an IP gets an Info button to its Tempus page instead.
 - **WR posts:** the bot remembers each WR it sees, so a new one says whose record it beat and by how much. When it hasn't seen the old WR yet, it reads the zone's leaderboard (one request per WR) and says how far ahead of #2 the new time is.
+- **Demos:** a run's demo is usually uploaded when the server's recording ends, often an hour after the WR. The bot posts the WR straight away and adds **Download demo** (with the tick the run starts at) to the post once the demo is there, checking that one record a few times over the next hours.
+- **New maps:** the map list is read every 6 hours (`MAPS_REFRESH_HOURS`), and maps that weren't there before are posted in the records channel with their tiers, zones and authors.
+- **Server alerts:** a server that stays offline for 5 minutes (`OFFLINE_ALERT_MINUTES`) is posted in `#tempus-alerts`, and again when it's back. Hidden and retired servers are left out. If the Tempus API itself stops answering, that gets its own alert instead, since server status is unknown then.
 - **Settings:** all other options are in `.env.example`. The defaults are fine to start with.
 
 ## Security

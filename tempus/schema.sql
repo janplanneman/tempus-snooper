@@ -49,6 +49,15 @@ CREATE TABLE IF NOT EXISTS wrs (
     PRIMARY KEY (zone_id, class)
 );
 
+-- WR posts whose demo wasn't uploaded yet: checked again with backoff, and the posts edited once it's there
+CREATE TABLE IF NOT EXISTS pending_demos (
+    record_id  INTEGER PRIMARY KEY,
+    post       TEXT    NOT NULL,  -- JSON: what the post was built from, to build it again with the demo
+    messages   TEXT    NOT NULL,  -- JSON: [[channel_id, message_id], ...]
+    attempts   INTEGER NOT NULL DEFAULT 0,
+    next_check REAL    NOT NULL
+);
+
 -- history: players online every few minutes, and the busy servers at that moment
 CREATE TABLE IF NOT EXISTS snapshots (
     ts      REAL PRIMARY KEY,

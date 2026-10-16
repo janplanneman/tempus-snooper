@@ -183,7 +183,7 @@ def header_text(title: str, busy: Sequence[Dict[str, Any]], empty: int, region: 
     if usual:
         lines.append(f"-# Usually around {plural(usual[0], 'player')}{where} at this time on {usual[1]} (UTC)")
     if stale_since:
-        lines.append(f"⚠️ No answer from Tempus since <t:{int(stale_since)}:R>, so this is the last data it sent.")
+        lines.append(f"⚠️ No answer from Tempus since <t:{int(stale_since)}:t> (<t:{int(stale_since)}:R>), so this is the last data it sent.")
     return "\n".join(lines)
 
 

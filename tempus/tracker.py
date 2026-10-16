@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 # fewer maps than this in maps/detailedList is a glitch, not Tempus deleting its maps
 MIN_MAPS = 100
 RETRY_FAILED_JOB_S = 600
+MAX_NEW_MAPS = 20
 _CONTROL_RE = re.compile(r"[\x00-\x1f\x7f]")
 
 Tiers = Tuple[Optional[int], Optional[int]]
@@ -109,7 +110,10 @@ def parse_maps(data: Any) -> List[Dict[str, Any]]:
         try:
             ts, td = _tiers(m.get("tier_info"))
             rs, rd = _tiers(m.get("rating_info"))
-            rows.append({"name": str(m["name"]), "id": _int(m.get("id")), "tier_soldier": ts, "tier_demoman": td, "rating_soldier": rs, "rating_demoman": rd})
+            authors = [clean_name(a.get("name")) for a in m.get("authors") or [] if isinstance(a, dict) and a.get("name")]
+            counts = m.get("zone_counts") if isinstance(m.get("zone_counts"), dict) else {}
+            rows.append({"name": str(m["name"]), "id": _int(m.get("id")), "tier_soldier": ts, "tier_demoman": td, "rating_soldier": rs, "rating_demoman": rd,
+                         "authors": authors, "zone_counts": counts})
         except Exception:
             log.warning("Skipping a map entry I couldn't read: %.200r", m)
     if len(rows) < MIN_MAPS:
@@ -145,6 +149,7 @@ class Tracker:
         self._map_state: Dict[int, Dict[str, Any]] = {}
         self.after_cycle: Optional[Callable[[], Awaitable[None]]] = None
         self.on_activity: Optional[Callable[[Any], Awaitable[None]]] = None
+        self.on_new_maps: Optional[Callable[[List[Dict[str, Any]]], Awaitable[None]]] = None
         self.health: Dict[str, Any] = {"started_at": now(), "cycles": 0, "consecutive_failures": 0, "last_cycle_start": None, "last_cycle_end": None,
                                        "last_cycle_duration": None, "last_cycle_ok": None, "last_error": None}
 
@@ -223,11 +228,19 @@ class Tracker:
             return
         self._maps_due = t + RETRY_FAILED_JOB_S
         rows = parse_maps(await self.client.get("maps/detailedList"))
+        known = set(self.tiers)
         await self.store.replace_maps(rows, t)
         self.tiers = {m["name"]: (m["tier_soldier"], m["tier_demoman"]) for m in rows}
         self.maps_at = t
         self._maps_due = t + self.cfg.maps_refresh_s
-        log.info("Map list: %d maps", len(rows))
+        new = [m for m in rows if m["name"] not in known]
+        log.info("Map list: %d maps, %d new", len(rows), len(new) if known else 0)
+        # the first read has nothing to compare with, and a flood of "new" maps is a glitch, not Tempus adding them
+        if known and new and self.on_new_maps is not None:
+            if len(new) > MAX_NEW_MAPS:
+                log.warning("%d new maps at once; not announcing them", len(new))
+            else:
+                await self.on_new_maps(new)
 
     async def check_activity(self) -> None:
         if self.on_activity is None:

@@ -220,7 +220,7 @@ def test_board_full_load_fits_discord_limits() -> None:
     check_limits(board)
     no_dots_or_escaped_labels(board)
     joined = "\n".join(texts(board))
-    assert "**1416 players** on **59 servers**" in joined and "No answer from Tempus since <t:1800000000:R>" in joined
+    assert "**1416 players** on **59 servers**" in joined and "No answer from Tempus since <t:1800000000:t> (<t:1800000000:R>)" in joined
     assert "-# +20 more" in joined  # rows show 4 players, then the rest as a count
 
     # three times as many busy servers: the "Also" lines are cut short with "+N more"
@@ -454,7 +454,11 @@ def test_record_embeds() -> None:
     assert e.title == "🏆 New map WR on jump_lamia" and e.url == "https://tempus2.xyz/maps/jump_lamia"
     second = context["second"]["player"]
     # no backslashes inside the link label: Discord would show them
-    assert e.description == f"🇦🇺 **[geek_(x)](https://tempus2.xyz/players/99892)** as Demoman in **1:05.985**\n**0.525 s** ahead of #2 {second}\n-# set <t:1800000000:R>"
+    # the leaderboard's #1 is this record, so its demo comes along
+    assert e.description == (f"🇦🇺 **[geek_(x)](https://tempus2.xyz/players/99892)** as Demoman in **1:05.985**\n**0.525 s** ahead of #2 {second}\n"
+                             "[Download demo](https://demos-archive.tempus2.xyz/38/d2/auto-20261016-113610-jump_lamia.zip), the run starts at tick 64232\n"
+                             "-# set <t:1800000000:R>")
+    assert "Download demo" not in records.record_embed(dict(wr, id=1), {}, {}, context=context).description  # someone else's #1
     assert e.footer.text == "Tier 5, 268 demoman completions, set on AU2" and e.timestamp is not None
 
     old = {"record_id": 1, "player_id": 42, "player": "Farma", "duration": 66.516}
@@ -487,10 +491,11 @@ class FakeMessage:
             import types
             raise discord.NotFound(types.SimpleNamespace(status=404, reason="Not Found"), "gone")
 
-    async def edit(self, view: Any) -> None:
+    async def edit(self, view: Any = None, embed: Any = None) -> None:
         self._check()
         self.channel.edits += 1
         self.channel.last_view = view
+        self.channel.edited.append((self.id, view if view is not None else embed))
 
     async def delete(self) -> None:
         self._check()
@@ -503,6 +508,7 @@ class FakeChannel:
         self.messages: List[int] = []
         self.sent: List[Any] = []
         self.edits = 0
+        self.edited: List[Any] = []
         self.last_view: Any = None
 
     def permissions_for(self, member: Any) -> FakePerms:
@@ -531,17 +537,21 @@ class FakeBot:
     def __init__(self, guilds: List[FakeGuild]) -> None:
         self.guilds = guilds
 
+    def get_channel(self, cid: int) -> Optional[FakeChannel]:
+        return next((c for g in self.guilds for c in g.text_channels if c.id == cid), None)
+
     def is_ready(self) -> bool:
         return True
 
 
 class FakeTracker:
-    after_cycle = on_activity = None
+    after_cycle = on_activity = on_new_maps = None
 
     def __init__(self) -> None:
         self.servers, _ = parse_status(fixture("statusList.json"))
         self.updated_at: Optional[float] = time.time()
         self.tiers = tiers_from_fixture()
+        self.health: Dict[str, Any] = {"started_at": time.time() - 3600, "last_cycle_ok": True}
 
     def stale_since(self) -> Optional[float]:
         return None
@@ -703,3 +713,176 @@ def test_list_messages_stay_within_discord_limits() -> None:
     assert all(f"**Player {i}**" in shown for i in range(300))
     for embeds in messages:
         assert len(embeds) <= 10 and sum(len(e) for e in embeds) <= 6000 and all(len(e.description) <= 4096 for e in embeds)
+
+
+# --- alerts, new maps, demos --------------------------------------------------------------------------------------
+
+def test_server_alert_logic() -> None:
+    from tempus import alerts
+    servers, _ = parse_status(fixture("statusList.json"))
+    au3 = next(s for s in servers if s["shortname"] == "AU3")
+    au3["online"] = False
+    state, events = alerts.check_servers({}, servers, 1000.0, 300)
+    assert events == [] and state == {str(au3["id"]): {"since": 1000.0, "alerted": False}}  # a quick restart isn't news
+    state, events = alerts.check_servers(state, servers, 1299.0, 300)
+    assert events == []
+    state, events = alerts.check_servers(state, servers, 1300.0, 300)
+    assert [(e["kind"], e["server"]["shortname"], e["since"]) for e in events] == [("down", "AU3", 1000.0)]
+    state, events = alerts.check_servers(state, servers, 2000.0, 300)
+    assert events == []  # reported once
+    au3["online"] = True
+    state, events = alerts.check_servers(state, servers, 2500.0, 300)
+    assert [(e["kind"], e["until"] - e["since"]) for e in events] == [("up", 1500.0)] and state == {}
+    # offline but back before it was reported: nothing at all
+    au3["online"] = False
+    state, _ = alerts.check_servers({}, servers, 0.0, 300)
+    au3["online"] = True
+    assert alerts.check_servers(state, servers, 100.0, 300) == ({}, [])
+    # retired (gone from the list or hidden) while down: dropped quietly
+    au3["online"] = False
+    state, _ = alerts.check_servers({}, servers, 0.0, 300)
+    state, _ = alerts.check_servers(state, servers, 400.0, 300)
+    assert alerts.check_servers(state, [s for s in servers if s is not au3], 500.0, 300) == ({}, [])
+
+    down = alerts.server_embed({"kind": "down", "server": au3, "since": 1000.0})
+    assert down.description == "🔴 🇦🇺 **AU3** jump.tf (Sydney) All Maps #2 is offline\n-# Offline since <t:1000:t> (<t:1000:R>), address 51.161.199.24:27035"
+    up = alerts.server_embed({"kind": "up", "server": au3, "since": 1000.0, "until": 1000.0 + 23 * 60})
+    assert up.description.endswith("It was down for 23 minutes") and alerts.duration_text(3 * 3600 + 5 * 60) == "3 h 05 min"
+    assert "·" not in down.description + up.description
+
+
+def test_alerts_posted_to_alerts_channel() -> None:
+    from tempus.cog import ServersCog
+
+    async def go() -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = await Storage.open(os.path.join(tmp, "t.db"))
+            channel = FakeChannel(40, "tempus-alerts", ok=True)
+            tracker = FakeTracker()
+            cfg = Config(discord_token="x", offline_alert_s=0)
+            cog = ServersCog(FakeBot([FakeGuild(4, "G", [channel])]), cfg, store, None, tracker, RankService(store, None, 1, 1))  # type: ignore[arg-type]
+            await cog._check_alerts()
+            assert channel.sent == []
+            au3 = next(s for s in tracker.servers if s["shortname"] == "AU3")
+            au3["online"] = False
+            await cog._check_alerts()
+            await cog._check_alerts()
+            assert len(channel.sent) == 1 and "**AU3**" in channel.sent[0][0].description and "is offline" in channel.sent[0][0].description
+            # the state survives a restart: no second "offline" for the same outage
+            again = ServersCog(FakeBot([FakeGuild(4, "G", [channel])]), cfg, store, None, tracker, RankService(store, None, 1, 1))  # type: ignore[arg-type]
+            await again._check_alerts()
+            assert len(channel.sent) == 1
+            au3["online"] = True
+            await again._check_alerts()
+            assert len(channel.sent) == 2 and "back online" in channel.sent[1][0].description
+
+            # the Tempus API not answering: one alert, nothing about servers meanwhile, then the all-clear
+            tracker.updated_at = time.time() - 3600
+            tracker.health["last_cycle_ok"] = False
+            au3["online"] = False
+            await again._check_alerts()
+            await again._check_alerts()
+            assert len(channel.sent) == 3 and "Tempus API hasn't answered" in channel.sent[2][0].description
+            tracker.updated_at = time.time()
+            tracker.health["last_cycle_ok"] = True
+            au3["online"] = True
+            await again._check_alerts()
+            assert len(channel.sent) == 4 and "answering again" in channel.sent[3][0].description
+            await store.close()
+
+    run(go())
+
+
+def test_new_maps_announced_after_the_first_read() -> None:
+    from tempus.tracker import Tracker
+
+    class FakeClient:
+        def __init__(self) -> None:
+            self.maps = fixture("detailedList.json") * 2
+
+        async def get(self, path: str) -> Any:
+            assert path == "maps/detailedList"
+            return self.maps
+
+    async def go() -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = await Storage.open(os.path.join(tmp, "t.db"))
+            client = FakeClient()
+            tracker = Tracker(Config(discord_token="x"), client, store, None)  # type: ignore[arg-type]
+            announced: List[List[str]] = []
+
+            async def hook(maps: List[Dict[str, Any]]) -> None:
+                announced.append([m["name"] for m in maps])
+            tracker.on_new_maps = hook
+            await tracker.refresh_maps()
+            assert announced == [] and len(tracker.tiers) > 50  # nothing to compare with on the first read
+
+            new = dict(client.maps[0], name="jump_brand_new", id=99999, tier_info={"3": 6, "4": 4},
+                       authors=[{"name": "someone"}], zone_counts={"map": 1, "course": 3, "bonus": 1})
+            client.maps = client.maps + [new]
+            tracker._maps_due = 0
+            await tracker.refresh_maps()
+            assert announced == [["jump_brand_new"]]
+
+            client.maps = client.maps + [dict(new, name=f"jump_glitch_{i}") for i in range(25)]
+            tracker._maps_due = 0
+            await tracker.refresh_maps()
+            assert len(announced) == 1  # 25 at once is a glitch
+
+            # a restart reads the stored list, so it doesn't announce everything again
+            fresh = Tracker(Config(discord_token="x"), client, store, None)  # type: ignore[arg-type]
+            await fresh.load()
+            fresh.on_new_maps = hook
+            fresh._maps_due = 0
+            await fresh.refresh_maps()
+            assert len(announced) == 1
+            await store.close()
+
+    run(go())
+    e = records.new_map_embed({"name": "jump_brand_new", "tier_soldier": 6, "tier_demoman": 4, "zone_counts": {"course": 3, "bonus": 1, "trick": 0}, "authors": ["some_one"]})
+    assert e.title == "🗺️ New map on Tempus: jump_brand_new" and e.url == "https://tempus2.xyz/maps/jump_brand_new"
+    assert e.description == "T6 soldier, T4 demo\n3 courses, 1 bonus\n-# by some\\_one"
+
+
+def test_demo_added_to_the_post_later() -> None:
+    from tempus.cog import ServersCog
+
+    overview: Dict[str, Any] = {"record_info": {"id": 999_999_999, "demo_start_tick": 1234}, "demo_info": None}
+
+    class FakeClient:
+        def __init__(self) -> None:
+            self.calls: List[str] = []
+
+        async def get(self, path: str) -> Any:
+            self.calls.append(path)
+            return overview if path.startswith("records/id/") else fixture("zone_records.json")
+
+    async def go() -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = await Storage.open(os.path.join(tmp, "t.db"))
+            feed = FakeChannel(30, "tempus-records", ok=True)
+            client = FakeClient()
+            cog = ServersCog(FakeBot([FakeGuild(3, "G", [feed])]), Config(discord_token="x"), store, client, FakeTracker(), RankService(store, None, 1, 1))  # type: ignore[arg-type]
+            activity = fixture("activity.json")
+            await cog.on_activity(activity)
+            wr = json.loads(json.dumps(activity["map_wrs"][0]))
+            wr["record_info"].update(id=999_999_999, date=time.time() - 60, duration=wr["record_info"]["duration"] - 0.5)
+            activity["map_wrs"].insert(0, wr)
+            await cog.on_activity(activity)
+            assert len(feed.sent) == 1 and "Download demo" not in feed.sent[0][0].description
+            assert await store.pending_demo_count() == 1
+
+            await store.retry_pending_demo(999_999_999, 0, 0)  # due now; the demo isn't uploaded yet
+            await cog._check_demos()
+            assert feed.edited == [] and client.calls[-1] == "records/id/999999999/overview"
+            assert (await store.due_pending_demos(time.time() + 1200, 5))[0]["attempts"] == 1
+
+            overview["demo_info"] = {"url": "https://demos-archive.tempus2.xyz/x/y/auto-1.zip", "expired": False, "deleted": False}
+            await store.retry_pending_demo(999_999_999, 1, 0)
+            await cog._check_demos()
+            assert len(feed.edited) == 1 and feed.edited[0][0] == feed.messages[0]
+            assert "[Download demo](https://demos-archive.tempus2.xyz/x/y/auto-1.zip), the run starts at tick 1234" in feed.edited[0][1].description
+            assert await store.pending_demo_count() == 0
+            await store.close()
+
+    run(go())
