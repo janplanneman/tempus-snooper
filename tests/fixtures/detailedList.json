@@ -1,0 +1,1543 @@
+[
+ {
+  "id": 671,
+  "name": "jump_",
+  "zone_counts": {
+   "checkpoint": 9,
+   "linear": 1,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 3
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 7
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 3
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "5j2Zceu-Eok"
+  }
+ },
+ {
+  "id": 346,
+  "name": "jump_4dakids_final",
+  "zone_counts": {
+   "special": 5,
+   "checkpoint": 2,
+   "linear": 1,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 2
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "A0fhVmorkaQ",
+   "demoman": null
+  }
+ },
+ {
+  "id": 4,
+  "name": "jump_4demo_fixed5",
+  "zone_counts": {
+   "checkpoint": 2,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 2
+  },
+  "videos": {
+   "soldier": "PifzXwD-eDU",
+   "demoman": "eIQCxIlrido"
+  }
+ },
+ {
+  "id": 752,
+  "name": "jump_achlys",
+  "zone_counts": {
+   "checkpoint": 3,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "_rXKkSELjHo"
+  }
+ },
+ {
+  "id": 396,
+  "name": "jump_aqua",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 5,
+   "linear": 1,
+   "bonus": 5,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "S69mWpqFap4",
+   "demoman": null
+  }
+ },
+ {
+  "id": 495,
+  "name": "jump_ataronchronon_b2",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 2
+  },
+  "videos": {
+   "soldier": "YzNunJxCh8s",
+   "demoman": null
+  }
+ },
+ {
+  "id": 686,
+  "name": "jump_authn_b6",
+  "zone_counts": {
+   "checkpoint": 6,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "trick": 6,
+   "map_end": 1,
+   "map": 1,
+   "misc": 20
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": "gLnSyn36lIo",
+   "demoman": "gaM1YHP0Dhs"
+  }
+ },
+ {
+  "id": 581,
+  "name": "jump_benroads3",
+  "zone_counts": {
+   "checkpoint": 6,
+   "bonus_end": 6,
+   "linear": 1,
+   "bonus": 6,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "CwSI0enNe3I",
+   "demoman": null
+  }
+ },
+ {
+  "id": 246,
+  "name": "jump_benroads_a5",
+  "zone_counts": {
+   "checkpoint": 3,
+   "bonus_end": 4,
+   "linear": 1,
+   "bonus": 4,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "-EbhEi-JJQo",
+   "demoman": null
+  }
+ },
+ {
+  "id": 389,
+  "name": "jump_biome",
+  "zone_counts": {
+   "checkpoint": 4,
+   "course": 4,
+   "course_end": 3,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "DtuAHyYQepw",
+   "demoman": null
+  }
+ },
+ {
+  "id": 627,
+  "name": "jump_booyah_jmc",
+  "zone_counts": {
+   "checkpoint": 6,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 2,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "l3OPWNeeapQ"
+  }
+ },
+ {
+  "id": 367,
+  "name": "jump_boredfox_b1",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 3,
+   "linear": 1,
+   "bonus": 3,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "goBX1aQFvbs",
+   "demoman": null
+  }
+ },
+ {
+  "id": 279,
+  "name": "jump_bouncerific_v2",
+  "zone_counts": {
+   "checkpoint": 2,
+   "special": 1,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "trick": 2,
+   "map_end": 1,
+   "map": 1,
+   "misc": 2
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 3
+  },
+  "videos": {
+   "soldier": "G9bHFPjQMt8",
+   "demoman": null
+  }
+ },
+ {
+  "id": 30,
+  "name": "jump_cake",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 3,
+   "bonus": 3,
+   "course": 2,
+   "trick": 2,
+   "course_end": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 3
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": "JqgcZGfwpg0",
+   "demoman": "87NYieYn94M"
+  }
+ },
+ {
+  "id": 488,
+  "name": "jump_camp_rc2",
+  "zone_counts": {
+   "checkpoint": 9,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "Oh6EkOBz9N4",
+   "demoman": null
+  }
+ },
+ {
+  "id": 524,
+  "name": "jump_cetalu_rc1",
+  "zone_counts": {
+   "special": 1,
+   "checkpoint": 5,
+   "bonus_end": 5,
+   "linear": 1,
+   "bonus": 5,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "6BTIjkUUJUU",
+   "demoman": null
+  }
+ },
+ {
+  "id": 563,
+  "name": "jump_chasm_final",
+  "zone_counts": {
+   "checkpoint": 4,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "j6JYPPSvQqw",
+   "demoman": null
+  }
+ },
+ {
+  "id": 36,
+  "name": "jump_demolition",
+  "zone_counts": {
+   "checkpoint": 1,
+   "bonus_end": 3,
+   "linear": 1,
+   "bonus": 3,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 3
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": "Z1wqDAOjQWs",
+   "demoman": "3yXPqFcVXeg"
+  }
+ },
+ {
+  "id": 584,
+  "name": "jump_forest_rc4",
+  "zone_counts": {
+   "checkpoint": 3,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "VKPGamXhkrI",
+   "demoman": null
+  }
+ },
+ {
+  "id": 825,
+  "name": "jump_for_rc1",
+  "zone_counts": {
+   "checkpoint": 11,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 2,
+   "4": 7
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 326,
+  "name": "jump_gman_beta5_final_rebuild_rc1",
+  "zone_counts": {
+   "checkpoint": 1,
+   "bonus_end": 4,
+   "linear": 1,
+   "bonus": 4,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 4
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": "jhC95pS-1WE",
+   "demoman": "Y-ll0XaGPwk"
+  }
+ },
+ {
+  "id": 69,
+  "name": "jump_half",
+  "zone_counts": {
+   "checkpoint": 1,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "OGRBcHOd_3c",
+   "demoman": null
+  }
+ },
+ {
+  "id": 216,
+  "name": "jump_home_v2",
+  "zone_counts": {
+   "checkpoint": 3,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "trick": 2,
+   "map_end": 1,
+   "map": 1,
+   "misc": 5
+  },
+  "tier_info": {
+   "3": 2,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "Ry9HyGHLeho",
+   "demoman": null
+  }
+ },
+ {
+  "id": 781,
+  "name": "jump_hulk_a4",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 212,
+  "name": "jump_internal_b4",
+  "zone_counts": {
+   "checkpoint": 2,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 2
+  },
+  "videos": {
+   "soldier": "FJ3eZy4a_vM",
+   "demoman": "isYzRCsCgK8"
+  }
+ },
+ {
+  "id": 516,
+  "name": "jump_jasmine",
+  "zone_counts": {
+   "checkpoint": 5,
+   "course": 2,
+   "course_end": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 2,
+   "4": 5
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "J0kXQqxMqlc"
+  }
+ },
+ {
+  "id": 225,
+  "name": "jump_mario_beta1_zip",
+  "zone_counts": {
+   "checkpoint": 3,
+   "bonus_end": 7,
+   "bonus": 7,
+   "course": 3,
+   "course_end": 2,
+   "trick": 10,
+   "map_end": 1,
+   "map": 1,
+   "misc": 18
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "_TSsOIZNzbA",
+   "demoman": null
+  }
+ },
+ {
+  "id": 585,
+  "name": "jump_miner",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 4,
+   "bonus": 4,
+   "course": 2,
+   "course_end": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 1
+  },
+  "videos": {
+   "soldier": "yzu2Noe4lno",
+   "demoman": "Te-9-Hk4lNw"
+  }
+ },
+ {
+  "id": 398,
+  "name": "jump_mireal3_final",
+  "zone_counts": {
+   "checkpoint": 4,
+   "course": 3,
+   "course_end": 2,
+   "trick": 3,
+   "map_end": 1,
+   "map": 1,
+   "misc": 13
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 7
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 2
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "_VbiFWehM5k"
+  }
+ },
+ {
+  "id": 835,
+  "name": "jump_mossy_rc2",
+  "zone_counts": {
+   "checkpoint": 9,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 626,
+  "name": "jump_mourn_a3",
+  "zone_counts": {
+   "checkpoint": 5,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "-_maub7eTWY",
+   "demoman": null
+  }
+ },
+ {
+  "id": 640,
+  "name": "jump_nine_final",
+  "zone_counts": {
+   "checkpoint": 3,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 2
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 4
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "8zFhvcrPxNE"
+  }
+ },
+ {
+  "id": 436,
+  "name": "jump_noskillrequired_b3",
+  "zone_counts": {
+   "checkpoint": 10,
+   "bonus_end": 1,
+   "bonus": 1,
+   "course": 3,
+   "course_end": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "qfugsEnzyYc",
+   "demoman": null
+  }
+ },
+ {
+  "id": 638,
+  "name": "jump_nysel_final2",
+  "zone_counts": {
+   "checkpoint": 5,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "gVXjauARwyQ",
+   "demoman": null
+  }
+ },
+ {
+  "id": 782,
+  "name": "jump_nyx",
+  "zone_counts": {
+   "checkpoint": 6,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 692,
+  "name": "jump_ozone",
+  "zone_counts": {
+   "checkpoint": 4,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "9cu3dPKFoZw",
+   "demoman": null
+  }
+ },
+ {
+  "id": 281,
+  "name": "jump_pants_b2",
+  "zone_counts": {
+   "special": 1,
+   "checkpoint": 3,
+   "bonus_end": 3,
+   "linear": 1,
+   "bonus": 3,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "p1MJ2bF4uFc",
+   "demoman": null
+  }
+ },
+ {
+  "id": 327,
+  "name": "jump_phobos_zip",
+  "zone_counts": {
+   "checkpoint": 1,
+   "linear": 1,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 2
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "PkBkN0DhBhE",
+   "demoman": null
+  }
+ },
+ {
+  "id": 733,
+  "name": "jump_pow",
+  "zone_counts": {
+   "checkpoint": 4,
+   "linear": 1,
+   "trick": 19,
+   "map_end": 1,
+   "map": 1,
+   "misc": 38
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "pOzm6b0UhIo",
+   "demoman": null
+  }
+ },
+ {
+  "id": 442,
+  "name": "jump_pump",
+  "zone_counts": {
+   "checkpoint": 5,
+   "bonus_end": 4,
+   "linear": 1,
+   "bonus": 4,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "LblhCi4LjLU",
+   "demoman": null
+  }
+ },
+ {
+  "id": 114,
+  "name": "jump_quba",
+  "zone_counts": {
+   "checkpoint": 3,
+   "course": 3,
+   "course_end": 2,
+   "trick": 3,
+   "map_end": 1,
+   "map": 1,
+   "misc": 8
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "NwmJDVCsbZQ",
+   "demoman": "RCDXp48kxdE"
+  }
+ },
+ {
+  "id": 736,
+  "name": "jump_rex_final",
+  "zone_counts": {
+   "checkpoint": 6,
+   "course": 2,
+   "course_end": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "8-r2ASyP_e4",
+   "demoman": null
+  }
+ },
+ {
+  "id": 233,
+  "name": "jump_steak_a2",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 6,
+   "bonus": 6,
+   "course": 4,
+   "course_end": 3,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 1
+  },
+  "videos": {
+   "soldier": "EtldaxLLVTk",
+   "demoman": "l2C_L7rCtTU"
+  }
+ },
+ {
+  "id": 447,
+  "name": "jump_stella_v2",
+  "zone_counts": {
+   "checkpoint": 8,
+   "linear": 1,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 3
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "12wSIU3GZQ4",
+   "demoman": null
+  }
+ },
+ {
+  "id": 476,
+  "name": "jump_strikapult_v11",
+  "zone_counts": {
+   "checkpoint": 5,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "trick": 5,
+   "map_end": 1,
+   "map": 1,
+   "misc": 14
+  },
+  "tier_info": {
+   "3": 7,
+   "4": 5
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "59gtbcNaHiw",
+   "demoman": null
+  }
+ },
+ {
+  "id": 808,
+  "name": "jump_sylvestres_rc2",
+  "zone_counts": {
+   "checkpoint": 7,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 793,
+  "name": "jump_taylor_swift_2_final",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 18,
+   "linear": 1,
+   "bonus": 18,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 438,
+  "name": "jump_tensor_a2_zip",
+  "zone_counts": {
+   "checkpoint": 6,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 4
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "MYEHhkpgj3Y"
+  }
+ },
+ {
+  "id": 146,
+  "name": "jump_tholos",
+  "zone_counts": {
+   "checkpoint": 2,
+   "linear": 1,
+   "trick": 6,
+   "map_end": 1,
+   "map": 1,
+   "misc": 23
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 3
+  },
+  "videos": {
+   "soldier": "ghugYZ7lkMQ",
+   "demoman": null
+  }
+ },
+ {
+  "id": 714,
+  "name": "jump_timtam_rc2",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 5
+  },
+  "rating_info": {
+   "3": 3,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "34x6HB05rXk"
+  }
+ },
+ {
+  "id": 189,
+  "name": "jump_titan",
+  "zone_counts": {
+   "checkpoint": 2,
+   "bonus_end": 2,
+   "linear": 1,
+   "bonus": 2,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 2
+  },
+  "videos": {
+   "soldier": "1oD6k-Dhwgg",
+   "demoman": "2sDxmRB-njc"
+  }
+ },
+ {
+  "id": 155,
+  "name": "jump_ultra_alpha",
+  "zone_counts": {
+   "special": 4,
+   "checkpoint": 2,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 3
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "FqgK2_ZbRIw",
+   "demoman": null
+  }
+ },
+ {
+  "id": 716,
+  "name": "jump_umon_rc2",
+  "zone_counts": {
+   "checkpoint": 4,
+   "linear": 1,
+   "trick": 3,
+   "map_end": 1,
+   "map": 1,
+   "misc": 7
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "SAJSimQm4D4",
+   "demoman": null
+  }
+ },
+ {
+  "id": 687,
+  "name": "jump_unclesam",
+  "zone_counts": {
+   "checkpoint": 4,
+   "course": 2,
+   "course_end": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 2
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "ybSdA-6ITrY"
+  }
+ },
+ {
+  "id": 252,
+  "name": "jump_urgent_final",
+  "zone_counts": {
+   "checkpoint": 2,
+   "bonus_end": 1,
+   "linear": 1,
+   "bonus": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "YmMD_vamdEQ",
+   "demoman": null
+  }
+ },
+ {
+  "id": 162,
+  "name": "jump_waves_final",
+  "zone_counts": {
+   "checkpoint": 2,
+   "linear": 1,
+   "trick": 2,
+   "map_end": 1,
+   "map": 1,
+   "misc": 5
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "nqT89X-Jbiw",
+   "demoman": null
+  }
+ },
+ {
+  "id": 413,
+  "name": "jump_yump_final1",
+  "zone_counts": {
+   "special": 1,
+   "checkpoint": 5,
+   "bonus_end": 2,
+   "bonus": 2,
+   "course": 2,
+   "course_end": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 3,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "h-kmoZA2Vfk",
+   "demoman": null
+  }
+ },
+ {
+  "id": 625,
+  "name": "jump_zyma_final5",
+  "zone_counts": {
+   "checkpoint": 4,
+   "bonus_end": 4,
+   "linear": 1,
+   "bonus": 4,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 5,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "e63LbSk9z9Y",
+   "demoman": null
+  }
+ },
+ {
+  "id": 169,
+  "name": "rj_rckteer_adv_v2",
+  "zone_counts": {
+   "checkpoint": 1,
+   "bonus_end": 3,
+   "linear": 1,
+   "bonus": 3,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 2,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "0QKxDPEW1oU",
+   "demoman": null
+  }
+ },
+ {
+  "id": 765,
+  "name": "conc_concept",
+  "zone_counts": {
+   "checkpoint": 3,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 2,
+   "4": 1
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 774,
+  "name": "df_recapture_final",
+  "zone_counts": {
+   "checkpoint": 5,
+   "linear": 1,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 1,
+   "4": 1
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 671,
+  "name": "jump_",
+  "zone_counts": {
+   "checkpoint": 9,
+   "linear": 1,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 3
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 7
+  },
+  "rating_info": {
+   "3": 4,
+   "4": 3
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": "5j2Zceu-Eok"
+  }
+ },
+ {
+  "id": 822,
+  "name": "jump_3holers_rc1",
+  "zone_counts": {
+   "checkpoint": 6,
+   "bonus_end": 10,
+   "linear": 1,
+   "bonus": 10,
+   "map_end": 1,
+   "map": 1
+  },
+  "tier_info": {
+   "3": 6,
+   "4": 4
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 2
+  },
+  "videos": {
+   "soldier": null,
+   "demoman": null
+  }
+ },
+ {
+  "id": 346,
+  "name": "jump_4dakids_final",
+  "zone_counts": {
+   "special": 5,
+   "checkpoint": 2,
+   "linear": 1,
+   "trick": 1,
+   "map_end": 1,
+   "map": 1,
+   "misc": 2
+  },
+  "tier_info": {
+   "3": 4,
+   "4": 2
+  },
+  "rating_info": {
+   "3": 1,
+   "4": 4
+  },
+  "videos": {
+   "soldier": "A0fhVmorkaQ",
+   "demoman": null
+  }
+ }
+]

@@ -1,0 +1,435 @@
+{
+ "map_wrs": [
+  {
+   "record_info": {
+    "id": 8803077,
+    "user_id": 99892,
+    "zone_id": 10274,
+    "duration": 65.985,
+    "date": 1792151599.736296,
+    "server_id": 38,
+    "class": 4
+   },
+   "player_info": {
+    "id": 99892,
+    "steamid": "STEAM_0:0:54",
+    "name": "geeked"
+   },
+   "map_info": {
+    "id": 705,
+    "name": "jump_lamia"
+   },
+   "zone_info": {
+    "id": 10274,
+    "map_id": 705,
+    "type": "map",
+    "zoneindex": 1,
+    "custom_name": null
+   }
+  },
+  {
+   "record_info": {
+    "id": 8803015,
+    "user_id": 392512,
+    "zone_id": 1694,
+    "duration": 101.835,
+    "date": 1792148096.533511,
+    "server_id": 33,
+    "class": 3
+   },
+   "player_info": {
+    "id": 392512,
+    "steamid": "STEAM_0:0:55",
+    "name": "rubidus ^•ﻌ•^"
+   },
+   "map_info": {
+    "id": 147,
+    "name": "jump_torii_v3"
+   },
+   "zone_info": {
+    "id": 1694,
+    "map_id": 147,
+    "type": "map",
+    "zoneindex": 1,
+    "custom_name": null
+   }
+  },
+  {
+   "record_info": {
+    "id": 8802915,
+    "user_id": 523971,
+    "zone_id": 8093,
+    "duration": 52.98,
+    "date": 1792139108.111063,
+    "server_id": 19,
+    "class": 3
+   },
+   "player_info": {
+    "id": 523971,
+    "steamid": "STEAM_0:0:56",
+    "name": "Owlfy"
+   },
+   "map_info": {
+    "id": 634,
+    "name": "jump_sauciix_v4"
+   },
+   "zone_info": {
+    "id": 8093,
+    "map_id": 634,
+    "type": "map",
+    "zoneindex": 1,
+    "custom_name": null
+   }
+  }
+ ],
+ "course_wrs": [
+  {
+   "record_info": {
+    "id": 8800100,
+    "user_id": 543719,
+    "zone_id": 5588,
+    "duration": 97.29,
+    "date": 1792006231.679729,
+    "server_id": 61,
+    "class": 3
+   },
+   "player_info": {
+    "id": 543719,
+    "steamid": "STEAM_0:0:57",
+    "name": "th14 marisaB life exploit"
+   },
+   "map_info": {
+    "id": 423,
+    "name": "jump_vanished"
+   },
+   "zone_info": {
+    "id": 5588,
+    "map_id": 423,
+    "type": "course",
+    "zoneindex": 1,
+    "custom_name": null
+   }
+  },
+  {
+   "record_info": {
+    "id": 8799557,
+    "user_id": 543719,
+    "zone_id": 5591,
+    "duration": 166.995,
+    "date": 1791982958.7682,
+    "server_id": 23,
+    "class": 3
+   },
+   "player_info": {
+    "id": 543719,
+    "steamid": "STEAM_0:0:58",
+    "name": "th14 marisaB life exploit"
+   },
+   "map_info": {
+    "id": 423,
+    "name": "jump_vanished"
+   },
+   "zone_info": {
+    "id": 5591,
+    "map_id": 423,
+    "type": "course",
+    "zoneindex": 2,
+    "custom_name": null
+   }
+  },
+  {
+   "record_info": {
+    "id": 8799475,
+    "user_id": 10736,
+    "zone_id": 9776,
+    "duration": 65.115,
+    "date": 1791976244.208112,
+    "server_id": 17,
+    "class": 4
+   },
+   "player_info": {
+    "id": 10736,
+    "steamid": "STEAM_0:0:59",
+    "name": "<0"
+   },
+   "map_info": {
+    "id": 677,
+    "name": "jump_the_b7"
+   },
+   "zone_info": {
+    "id": 9776,
+    "map_id": 677,
+    "type": "course",
+    "zoneindex": 9,
+    "custom_name": "jump_nbn_ice_cake_revenge"
+   }
+  }
+ ],
+ "bonus_wrs": [
+  {
+   "record_info": {
+    "id": 8802985,
+    "user_id": 370388,
+    "zone_id": 6938,
+    "duration": 17.265,
+    "date": 1792144661.386647,
+    "server_id": 34,
+    "class": 3
+   },
+   "player_info": {
+    "id": 370388,
+    "steamid": "STEAM_0:0:60",
+    "name": "₍ᐢᐢ₎. usongi ₒOwOₒ"
+   },
+   "map_info": {
+    "id": 524,
+    "name": "jump_cetalu_rc1"
+   },
+   "zone_info": {
+    "id": 6938,
+    "map_id": 524,
+    "type": "bonus",
+    "zoneindex": 3,
+    "custom_name": null
+   }
+  },
+  {
+   "record_info": {
+    "id": 8801013,
+    "user_id": 543719,
+    "zone_id": 4825,
+    "duration": 3.45,
+    "date": 1792063567.005091,
+    "server_id": 23,
+    "class": 3
+   },
+   "player_info": {
+    "id": 543719,
+    "steamid": "STEAM_0:0:61",
+    "name": "th14 marisaB life exploit"
+   },
+   "map_info": {
+    "id": 363,
+    "name": "jump_onit_b4"
+   },
+   "zone_info": {
+    "id": 4825,
+    "map_id": 363,
+    "type": "bonus",
+    "zoneindex": 3,
+    "custom_name": null
+   }
+  },
+  {
+   "record_info": {
+    "id": 8796259,
+    "user_id": 258600,
+    "zone_id": 12842,
+    "duration": 3.78,
+    "date": 1791818703.598295,
+    "server_id": 7,
+    "class": 3
+   },
+   "player_info": {
+    "id": 258600,
+    "steamid": "STEAM_0:0:62",
+    "name": "Z_Z"
+   },
+   "map_info": {
+    "id": 834,
+    "name": "jump_heresthecatch_rc6"
+   },
+   "zone_info": {
+    "id": 12842,
+    "map_id": 834,
+    "type": "bonus",
+    "zoneindex": 1,
+    "custom_name": null
+   }
+  }
+ ],
+ "trick_wrs": [
+  {
+   "record_info": {
+    "id": 8800028,
+    "user_id": 541999,
+    "zone_id": 11315,
+    "duration": 2.1,
+    "date": 1792003374.678709,
+    "server_id": 49,
+    "class": 3
+   },
+   "player_info": {
+    "id": 541999,
+    "steamid": "STEAM_0:0:63",
+    "name": "boistopmotion"
+   },
+   "map_info": {
+    "id": 733,
+    "name": "jump_pow"
+   },
+   "zone_info": {
+    "id": 11315,
+    "map_id": 733,
+    "type": "trick",
+    "zoneindex": 9,
+    "custom_name": "connector 8"
+   }
+  },
+  {
+   "record_info": {
+    "id": 8797444,
+    "user_id": 541999,
+    "zone_id": 11312,
+    "duration": 4.92,
+    "date": 1791871166.837995,
+    "server_id": 2,
+    "class": 3
+   },
+   "player_info": {
+    "id": 541999,
+    "steamid": "STEAM_0:0:64",
+    "name": "boistopmotion"
+   },
+   "map_info": {
+    "id": 733,
+    "name": "jump_pow"
+   },
+   "zone_info": {
+    "id": 11312,
+    "map_id": 733,
+    "type": "trick",
+    "zoneindex": 8,
+    "custom_name": "connector 7"
+   }
+  },
+  {
+   "record_info": {
+    "id": 8796921,
+    "user_id": 541999,
+    "zone_id": 11303,
+    "duration": 4.635,
+    "date": 1791842659.259746,
+    "server_id": 49,
+    "class": 3
+   },
+   "player_info": {
+    "id": 541999,
+    "steamid": "STEAM_0:0:65",
+    "name": "boistopmotion"
+   },
+   "map_info": {
+    "id": 733,
+    "name": "jump_pow"
+   },
+   "zone_info": {
+    "id": 11303,
+    "map_id": 733,
+    "type": "trick",
+    "zoneindex": 5,
+    "custom_name": "connector 4"
+   }
+  }
+ ],
+ "map_tops": [
+  {
+   "record_info": {
+    "id": 8803302,
+    "user_id": 35454,
+    "zone_id": 12858,
+    "duration": 76.605,
+    "date": 1792159839.542641,
+    "server_id": 7,
+    "class": 4,
+    "demo_id": 4073802,
+    "demo_start_tick": 298191,
+    "demo_end_tick": 303298,
+    "rank": 4
+   },
+   "player_info": {
+    "id": 35454,
+    "steamid": "STEAM_0:0:66",
+    "name": "wheat farmer"
+   },
+   "map_info": {
+    "id": 835,
+    "name": "jump_mossy_rc2",
+    "date_added": 1791074979.1817665
+   },
+   "zone_info": {
+    "id": 12858,
+    "map_id": 835,
+    "type": "map",
+    "zoneindex": 1,
+    "custom_name": null
+   },
+   "rank": 4
+  },
+  {
+   "record_info": {
+    "id": 8803258,
+    "user_id": 11459,
+    "zone_id": 1599,
+    "duration": 103.05,
+    "date": 1792158250.550561,
+    "server_id": 66,
+    "class": 3,
+    "demo_id": 4073775,
+    "demo_start_tick": 286548,
+    "demo_end_tick": 293457,
+    "rank": 2
+   },
+   "player_info": {
+    "id": 11459,
+    "steamid": "STEAM_0:0:67",
+    "name": "๋BLANK"
+   },
+   "map_info": {
+    "id": 54,
+    "name": "jump_excavation_final",
+    "date_added": 1402728343.949
+   },
+   "zone_info": {
+    "id": 1599,
+    "map_id": 54,
+    "type": "map",
+    "zoneindex": 1,
+    "custom_name": null
+   },
+   "rank": 2
+  },
+  {
+   "record_info": {
+    "id": 8802980,
+    "user_id": 243670,
+    "zone_id": 2661,
+    "duration": 53.865,
+    "date": 1792144105.182139,
+    "server_id": 16,
+    "class": 3,
+    "demo_id": 4073559,
+    "demo_start_tick": 259537,
+    "demo_end_tick": 263128,
+    "rank": 4
+   },
+   "player_info": {
+    "id": 243670,
+    "steamid": "STEAM_0:0:68",
+    "name": "cander"
+   },
+   "map_info": {
+    "id": 180,
+    "name": "jump_vertigo",
+    "date_added": 1405268894.36879
+   },
+   "zone_info": {
+    "id": 2661,
+    "map_id": 180,
+    "type": "map",
+    "zoneindex": 1,
+    "custom_name": null
+   },
+   "rank": 4
+  }
+ ]
+}

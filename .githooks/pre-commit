@@ -1,0 +1,44 @@
+#!/bin/sh
+# enable with: git config core.hooksPath .githooks
+
+fail=0
+say() { echo "pre-commit: $*" >&2; fail=1; }
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+old_ifs=$IFS
+IFS='
+'
+for f in $staged; do
+  case "$f" in
+    .env.example|*/.env.example) ;;
+    .env|.env.*|*/.env|*/.env.*) say "refusing to commit '$f' (secrets file)" ;;
+    *.db|*.db-wal|*.db-shm|*.db-journal|*.sqlite|*.sqlite3) say "refusing to commit '$f' (player database)" ;;
+    *.log|*.log.*) say "refusing to commit '$f' (log file)" ;;
+    *.pem|*.key) say "refusing to commit '$f' (key material)" ;;
+  esac
+done
+IFS=$old_ifs
+
+added=$(git diff --cached -U0 --no-color --diff-filter=ACMR -- . ':(exclude).githooks/pre-commit' | grep '^+' | grep -v '^+++')
+
+if [ -f .env ]; then
+  for var in DISCORD_TOKEN; do
+    val=$(sed -n "s/^${var}=//p" .env | head -n 1 | tr -d "\r\"'" )
+    if [ "${#val}" -ge 8 ] && printf '%s\n' "$added" | grep -qF -- "$val"; then
+      say "staged changes contain the value of $var from your .env"
+    fi
+  done
+fi
+
+if printf '%s\n' "$added" | grep -qE '[A-Za-z0-9_-]{24,}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27,}'; then
+  say "staged changes contain something that looks like a Discord bot token"
+fi
+if printf '%s\n' "$added" | grep -qE '^\+[[:space:]]*DISCORD_TOKEN[[:space:]]*=[[:space:]]*[^[:space:]]'; then
+  say "staged changes assign a value to DISCORD_TOKEN"
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo "pre-commit: commit blocked. Unstage the file/lines (git restore --staged <file>) and try again." >&2
+  exit 1
+fi
+exit 0

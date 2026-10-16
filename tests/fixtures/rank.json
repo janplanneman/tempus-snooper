@@ -1,0 +1,29 @@
+{
+ "player_info": {
+  "id": 664833,
+  "steamid": "STEAM_0:0:69",
+  "name": "fishsoup",
+  "first_seen": 1746318858.023694,
+  "last_seen": 1792155149.0452685,
+  "country": "Australia"
+ },
+ "rank_info": {
+  "points": 878.5,
+  "rank": 2498,
+  "total_ranked": 102681
+ },
+ "class_rank_info": {
+  "3": {
+   "points": 876.5,
+   "rank": 2141,
+   "total_ranked": 80618,
+   "title": "Plebeian"
+  },
+  "4": {
+   "points": 2.0,
+   "rank": 12027,
+   "total_ranked": 48930,
+   "title": "Peon"
+  }
+ }
+}

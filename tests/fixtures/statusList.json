@@ -1,0 +1,2046 @@
+[
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 68,
+   "name": "jump.tf (Dubai) All Maps #1",
+   "shortname": "AE1",
+   "country": "United Arab Emirates",
+   "addr": "dubai.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 69,
+   "name": "jump.tf (Dubai) All Maps #2",
+   "shortname": "AE2",
+   "country": "United Arab Emirates",
+   "addr": "dubai.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27025,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 36,
+   "name": "jump.tf (Argentina) Beginner",
+   "shortname": "AR1",
+   "country": "Argentina",
+   "addr": "argentina.tempus.xyz",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 37,
+   "name": "jump.tf (Argentina) Advanced",
+   "shortname": "AR2",
+   "country": "Argentina",
+   "addr": "argentina.tempus.xyz",
+   "ipAddr": null,
+   "port": 27020,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Sydney) | Beginners | Tempus Network",
+   "currentMap": "jump_home_v2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 302773912
+  },
+  "server_info": {
+   "id": 1,
+   "name": "jump.tf (Sydney) Beginners",
+   "shortname": "AU1",
+   "country": "Australia",
+   "addr": "sydney.tempus2.xyz",
+   "ipAddr": "51.161.199.24",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Sydney) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_stella_v2",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "fishsoup",
+     "id": 664833,
+     "steamid": "STEAM_0:0:1"
+    },
+    {
+     "name": "ultra rare cabbage eating cat",
+     "id": 320511,
+     "steamid": "STEAM_0:0:2"
+    },
+    {
+     "name": "lobster",
+     "id": 696640,
+     "steamid": "STEAM_0:0:3"
+    }
+   ],
+   "playerCount": 3,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 302826392
+  },
+  "server_info": {
+   "id": 10,
+   "name": "jump.tf (Sydney) All Maps #1",
+   "shortname": "AU2",
+   "country": "Australia",
+   "addr": "sydney.tempus2.xyz",
+   "ipAddr": "51.161.199.24",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Sydney) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_phobos_zip",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "The_Ordeal_of_Memes",
+     "id": 405268,
+     "steamid": "STEAM_0:0:4"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 302849080
+  },
+  "server_info": {
+   "id": 27,
+   "name": "jump.tf (Sydney) All Maps #2",
+   "shortname": "AU3",
+   "country": "Australia",
+   "addr": "sydney.tempus2.xyz",
+   "ipAddr": "51.161.199.24",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Sydney) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_benroads_a5",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 302871492
+  },
+  "server_info": {
+   "id": 28,
+   "name": "jump.tf (Sydney) Rank 500 Only",
+   "shortname": "AU4",
+   "country": "Australia",
+   "addr": "sydney.tempus2.xyz",
+   "ipAddr": "51.161.199.24",
+   "port": 27045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Sydney) | Rank 50 Only | Tempus Network",
+   "currentMap": "jump_forest_rc4",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 302839288
+  },
+  "server_info": {
+   "id": 38,
+   "name": "jump.tf (Sydney) Rank 50 Only",
+   "shortname": "AU5",
+   "country": "Australia",
+   "addr": "sydney.tempus2.xyz",
+   "ipAddr": "51.161.199.24",
+   "port": 27055,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Jump (Adelaide) | All Maps | Tempus Network",
+   "currentMap": "jump_rex_final",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 14565724
+  },
+  "server_info": {
+   "id": 42,
+   "name": "Jump (Adelaide) All Maps",
+   "shortname": "AU6",
+   "country": "Australia",
+   "addr": "adelaide.tempus2.xyz",
+   "ipAddr": "103.25.57.21",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 70,
+   "name": "jump.tf (Bahrain) All Maps #1",
+   "shortname": "BHR1",
+   "country": "Bahrain",
+   "addr": "bahrain.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 71,
+   "name": "jump.tf (Bahrain) All Maps #2",
+   "shortname": "BHR2",
+   "country": "Bahrain",
+   "addr": "bahrain.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27025,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Brasil) | Todas Mapas #1 | Tempus Network",
+   "currentMap": "jump_ozone",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Corbenik",
+     "id": 592669,
+     "steamid": "STEAM_0:0:5"
+    },
+    {
+     "name": "nego trufa",
+     "id": 0,
+     "steamid": "STEAM_0:0:6"
+    }
+   ],
+   "playerCount": 2,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 4395612
+  },
+  "server_info": {
+   "id": 47,
+   "name": "jump.tf (Brasil) Todos Mapas #1",
+   "shortname": "BR1",
+   "country": "Brazil",
+   "addr": "br.tempus2.xyz",
+   "ipAddr": "216.238.104.51",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Brasil) | Todos Mapas #2 | Tempus Network",
+   "currentMap": "jump_titan",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 4320912
+  },
+  "server_info": {
+   "id": 55,
+   "name": "jump.tf (Brasil) Todos Mapas #2",
+   "shortname": "BR2",
+   "country": "Brazil",
+   "addr": "br.tempus2.xyz",
+   "ipAddr": "216.238.104.51",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 56,
+   "name": "jump.tf (Brasil) Apenas Rank 500",
+   "shortname": "BR3",
+   "country": "Brazil",
+   "addr": "br.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27035,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Frankfurt) | Beginners | Tempus Network",
+   "currentMap": "jump_ataronchronon_b2",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Fluffie",
+     "id": 74069,
+     "steamid": "STEAM_0:0:7"
+    },
+    {
+     "name": "boraa",
+     "id": 81089,
+     "steamid": "STEAM_0:0:8"
+    },
+    {
+     "name": "sgt Bytheway",
+     "id": 247598,
+     "steamid": "STEAM_0:0:9"
+    },
+    {
+     "name": "god's favourite",
+     "id": 142030,
+     "steamid": "STEAM_0:0:10"
+    }
+   ],
+   "playerCount": 4,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 299884280
+  },
+  "server_info": {
+   "id": 62,
+   "name": "jump.tf (Frankfurt) Beginners",
+   "shortname": "DE1",
+   "country": "Germany",
+   "addr": "frankfurt.tempus2.xyz",
+   "ipAddr": "135.125.189.212",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Frankfurt) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_hulk_a4",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Dotcom",
+     "id": 664288,
+     "steamid": "STEAM_0:0:11"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 300409832
+  },
+  "server_info": {
+   "id": 63,
+   "name": "jump.tf (Frankfurt) All Maps #1",
+   "shortname": "DE2",
+   "country": "Germany",
+   "addr": "frankfurt.tempus2.xyz",
+   "ipAddr": "135.125.189.212",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Frankfurt) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_miner",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "thu4der",
+     "id": 274632,
+     "steamid": "STEAM_0:0:12"
+    },
+    {
+     "name": "race",
+     "id": 306453,
+     "steamid": "STEAM_0:0:13"
+    }
+   ],
+   "playerCount": 2,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 300099476
+  },
+  "server_info": {
+   "id": 64,
+   "name": "jump.tf (Frankfurt) All Maps #2",
+   "shortname": "DE3",
+   "country": "Germany",
+   "addr": "frankfurt.tempus2.xyz",
+   "ipAddr": "135.125.189.212",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Frankfurt) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_achlys",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "!!!",
+     "id": 0,
+     "steamid": "STEAM_0:0:14"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 300678416
+  },
+  "server_info": {
+   "id": 65,
+   "name": "jump.tf (Frankfurt) Rank 500 Only",
+   "shortname": "DE4",
+   "country": "Germany",
+   "addr": "frankfurt.tempus2.xyz",
+   "ipAddr": "135.125.189.212",
+   "port": 27045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Frankfurt) | Rank 100 Only | Tempus Network",
+   "currentMap": "jump_taylor_swift_2_final",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Ragib Black",
+     "id": 314957,
+     "steamid": "STEAM_0:0:15"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 299946532
+  },
+  "server_info": {
+   "id": 66,
+   "name": "jump.tf (Frankfurt) Rank 100 Only",
+   "shortname": "DE5",
+   "country": "Germany",
+   "addr": "frankfurt.tempus2.xyz",
+   "ipAddr": "135.125.189.212",
+   "port": 27055,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 15,
+   "name": "Dev Server",
+   "shortname": "DEV1",
+   "country": "United States",
+   "addr": "test.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27025,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 74,
+   "name": "Dev Server 2",
+   "shortname": "DEV2",
+   "country": "United Kingdom",
+   "addr": "london.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27065,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 3,
+   "name": "jump.tf (Germany) Beginner",
+   "shortname": "EU1",
+   "country": "Germany",
+   "addr": "eu.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 6,
+   "name": "jump.tf (Germany) Adv #1",
+   "shortname": "EU2",
+   "country": "Germany",
+   "addr": "eu.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27025,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 14,
+   "name": "jump.tf (Germany) Adv #2",
+   "shortname": "EU3",
+   "country": "Germany",
+   "addr": "eu.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27095,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Helsinki) | Beginners | Tempus Network",
+   "currentMap": "jump_internal_b4",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "vuggie",
+     "id": 170585,
+     "steamid": "STEAM_0:0:16"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 296941648
+  },
+  "server_info": {
+   "id": 35,
+   "name": "jump.tf (Helsinki) Beginners",
+   "shortname": "FI1",
+   "country": "Finland",
+   "addr": "helsinki.tempus2.xyz",
+   "ipAddr": "135.181.4.51",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Helsinki) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_nine_final",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "pridemalkin",
+     "id": 48948,
+     "steamid": "STEAM_0:0:17"
+    },
+    {
+     "name": "TheGameOf4",
+     "id": 143433,
+     "steamid": "STEAM_0:0:18"
+    }
+   ],
+   "playerCount": 2,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 297136624
+  },
+  "server_info": {
+   "id": 75,
+   "name": "jump.tf (Helsinki) All Maps #1",
+   "shortname": "FI2",
+   "country": "Finland",
+   "addr": "helsinki.tempus2.xyz",
+   "ipAddr": "135.181.4.51",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Helsinki) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_pow",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 297075872
+  },
+  "server_info": {
+   "id": 76,
+   "name": "jump.tf (Helsinki) All Maps #2",
+   "shortname": "FI3",
+   "country": "Finland",
+   "addr": "helsinki.tempus2.xyz",
+   "ipAddr": "135.181.4.51",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Helsinki) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_demolition",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "BINI",
+     "id": 444792,
+     "steamid": "STEAM_0:0:19"
+    },
+    {
+     "name": "czdawes",
+     "id": 291347,
+     "steamid": "STEAM_0:0:20"
+    },
+    {
+     "name": "Ranch -pp",
+     "id": 424649,
+     "steamid": "STEAM_0:0:21"
+    }
+   ],
+   "playerCount": 3,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 297267264
+  },
+  "server_info": {
+   "id": 77,
+   "name": "jump.tf (Helsinki) Rank 500 Only",
+   "shortname": "FI4",
+   "country": "Finland",
+   "addr": "helsinki.tempus2.xyz",
+   "ipAddr": "135.181.4.51",
+   "port": 27045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Helsinki) | Rank 100 Only | Tempus Network",
+   "currentMap": "jump_steak_a2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 296981176
+  },
+  "server_info": {
+   "id": 78,
+   "name": "jump.tf (Helsinki) Rank 100 Only",
+   "shortname": "FI5",
+   "country": "Finland",
+   "addr": "helsinki.tempus2.xyz",
+   "ipAddr": "135.181.4.51",
+   "port": 27055,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (France) All Maps #1 | Tempus Network",
+   "currentMap": "jump_boredfox_b1",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "<9 Homan",
+     "id": 678935,
+     "steamid": "STEAM_0:0:22"
+    },
+    {
+     "name": "✪ SenseiJuba",
+     "id": 429397,
+     "steamid": "STEAM_0:0:23"
+    },
+    {
+     "name": "Herbuu",
+     "id": 247085,
+     "steamid": "STEAM_0:0:24"
+    },
+    {
+     "name": "Rass -jcf",
+     "id": 614381,
+     "steamid": "STEAM_0:0:25"
+    }
+   ],
+   "playerCount": 4,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 70920252
+  },
+  "server_info": {
+   "id": 20,
+   "name": "jump.tf (France) All Maps #1",
+   "shortname": "FRA1",
+   "country": "France",
+   "addr": "france.tempus2.xyz",
+   "ipAddr": "149.202.86.218",
+   "port": 26015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (France) All Maps #2 | Tempus Network",
+   "currentMap": "jump_nyx",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "ronv45",
+     "id": 468688,
+     "steamid": "STEAM_0:0:26"
+    },
+    {
+     "name": "Earth",
+     "id": 672349,
+     "steamid": "STEAM_0:0:27"
+    }
+   ],
+   "playerCount": 2,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 71004300
+  },
+  "server_info": {
+   "id": 21,
+   "name": "jump.tf (France) All Maps #2",
+   "shortname": "FRA2",
+   "country": "France",
+   "addr": "france.tempus2.xyz",
+   "ipAddr": "149.202.86.218",
+   "port": 26025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (France) Rank 100 Only | Tempus Network",
+   "currentMap": "jump_mossy_rc2",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Farma",
+     "id": 170632,
+     "steamid": "STEAM_0:0:28"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 71075876
+  },
+  "server_info": {
+   "id": 22,
+   "name": "jump.tf (France) Rank 100 Only",
+   "shortname": "FRA3",
+   "country": "France",
+   "addr": "france.tempus2.xyz",
+   "ipAddr": "149.202.86.218",
+   "port": 26035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (France) Rank 50 Only | Tempus Network",
+   "currentMap": "jump_",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 71064512
+  },
+  "server_info": {
+   "id": 23,
+   "name": "jump.tf (France) Rank 50 Only",
+   "shortname": "FRA4",
+   "country": "France",
+   "addr": "france.tempus2.xyz",
+   "ipAddr": "149.202.86.218",
+   "port": 26045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 29,
+   "name": "jump.tf (France) (Expiring Jul 11) All Maps #1",
+   "shortname": "FRA5",
+   "country": "France",
+   "addr": "149.202.65.78",
+   "ipAddr": null,
+   "port": 26015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 30,
+   "name": "jump.tf (France) (Expiring Jul 11) All Maps #2",
+   "shortname": "FRA6",
+   "country": "France",
+   "addr": "149.202.65.78",
+   "ipAddr": null,
+   "port": 26025,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 31,
+   "name": "jump.tf (France) (Expiring Jul 11) Rank 100 Only",
+   "shortname": "FRA7",
+   "country": "France",
+   "addr": "149.202.65.78",
+   "ipAddr": null,
+   "port": 26035,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 32,
+   "name": "jump.tf (France) (Expiring Jul 11) All Maps #3",
+   "shortname": "FRA8",
+   "country": "France",
+   "addr": "149.202.65.78",
+   "ipAddr": null,
+   "port": 26045,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (London) | Beginners | Tempus Network",
+   "currentMap": "jump_biome",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 288686016
+  },
+  "server_info": {
+   "id": 57,
+   "name": "jump.tf (London) Beginners",
+   "shortname": "GBR1",
+   "country": "United Kingdom",
+   "addr": "london.tempus2.xyz",
+   "ipAddr": "198.244.176.57",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (London) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_zyma_final5",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Plume Brisé",
+     "id": 325019,
+     "steamid": "STEAM_0:0:29"
+    },
+    {
+     "name": "Zaxx",
+     "id": 70765,
+     "steamid": "STEAM_0:0:30"
+    }
+   ],
+   "playerCount": 2,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 288505560
+  },
+  "server_info": {
+   "id": 58,
+   "name": "jump.tf (London) All Maps #1",
+   "shortname": "GBR2",
+   "country": "United Kingdom",
+   "addr": "london.tempus2.xyz",
+   "ipAddr": "198.244.176.57",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (London) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_nysel_final2",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Boeggy",
+     "id": 643944,
+     "steamid": "STEAM_0:0:31"
+    },
+    {
+     "name": "t.tv/shanxJF",
+     "id": 457363,
+     "steamid": "STEAM_0:0:32"
+    }
+   ],
+   "playerCount": 2,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 288787664
+  },
+  "server_info": {
+   "id": 59,
+   "name": "jump.tf (London) All Maps #2",
+   "shortname": "GBR3",
+   "country": "United Kingdom",
+   "addr": "london.tempus2.xyz",
+   "ipAddr": "198.244.176.57",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (London) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_ultra_alpha",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "katy -JF",
+     "id": 597475,
+     "steamid": "STEAM_0:0:33"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 288226292
+  },
+  "server_info": {
+   "id": 60,
+   "name": "jump.tf (London) Rank 500 Only",
+   "shortname": "GBR4",
+   "country": "United Kingdom",
+   "addr": "london.tempus2.xyz",
+   "ipAddr": "198.244.176.57",
+   "port": 27045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (London) | Rank 100 Only | Tempus Network",
+   "currentMap": "jump_bouncerific_v2",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "scoob",
+     "id": 42573,
+     "steamid": "STEAM_0:0:34"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 288268324
+  },
+  "server_info": {
+   "id": 61,
+   "name": "jump.tf (London) Rank 100 Only",
+   "shortname": "GBR5",
+   "country": "United Kingdom",
+   "addr": "london.tempus2.xyz",
+   "ipAddr": "198.244.176.57",
+   "port": 27055,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "matcha Jump (Hong Kong) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_mireal3_final",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 99452288
+  },
+  "server_info": {
+   "id": 72,
+   "name": "matcha (Hong Kong) All Maps #1",
+   "shortname": "HKG1",
+   "country": "Hong Kong",
+   "addr": "hk.tempus2.xyz",
+   "ipAddr": "221.127.51.64",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "matcha Jump (Hong Kong) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_noskillrequired_b3",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "carbon-13",
+     "id": 33825,
+     "steamid": "STEAM_0:0:35"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 99408768
+  },
+  "server_info": {
+   "id": 73,
+   "name": "matcha (Hong Kong) All Maps #2",
+   "shortname": "HKG2",
+   "country": "Hong Kong",
+   "addr": "hk.tempus2.xyz",
+   "ipAddr": "221.127.51.64",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Sakura (Tokyo) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_waves_final",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 10089232
+  },
+  "server_info": {
+   "id": 53,
+   "name": "Sakura (Tokyo) All Maps #1",
+   "shortname": "JP1",
+   "country": "Japan",
+   "addr": "jp.tempus2.xyz",
+   "ipAddr": "45.249.89.97",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Himawari (Tokyo) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_quba",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 19677836
+  },
+  "server_info": {
+   "id": 54,
+   "name": "Himawari (Tokyo) All Maps #2",
+   "shortname": "JP2",
+   "country": "Japan",
+   "addr": "jp.tempus2.xyz",
+   "ipAddr": "45.249.89.97",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Cosmos (Tokyo) | All Maps #3 | Tempus Network",
+   "currentMap": "jump_4demo_fixed5",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Niji",
+     "id": 382395,
+     "steamid": "STEAM_0:0:36"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 8980752
+  },
+  "server_info": {
+   "id": 67,
+   "name": "Cosmos (Tokyo) All Maps #3",
+   "shortname": "JP3",
+   "country": "Japan",
+   "addr": "jp.tempus2.xyz",
+   "ipAddr": "45.249.89.97",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "멍멍 점프 - Jindo (Seoul) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_pump",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 1885640
+  },
+  "server_info": {
+   "id": 33,
+   "name": "멍멍 점프 - Jindo (Seoul) All Maps #1",
+   "shortname": "KR1",
+   "country": "South Korea",
+   "addr": "seoul.tempus2.xyz",
+   "ipAddr": "3.34.99.119",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "멍멍 점프 - Sapsaree (Seoul) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_cetalu_rc1",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 1815040
+  },
+  "server_info": {
+   "id": 34,
+   "name": "멍멍 점프 - Sapsaree (Seoul) All Maps #2",
+   "shortname": "KR2",
+   "country": "South Korea",
+   "addr": "seoul.tempus2.xyz",
+   "ipAddr": "3.34.99.119",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Jump (NZ) All Maps | Tempus Network",
+   "currentMap": "jump_4dakids_final",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "mrmonk",
+     "id": 106858,
+     "steamid": "STEAM_0:0:37"
+    },
+    {
+     "name": "clairborne practice",
+     "id": 669945,
+     "steamid": "STEAM_0:0:38"
+    },
+    {
+     "name": "I’ve got a bong that nobody k",
+     "id": 152011,
+     "steamid": "STEAM_0:0:39"
+    }
+   ],
+   "playerCount": 3,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 2263552
+  },
+  "server_info": {
+   "id": 26,
+   "name": "Jump (NZ) All Maps",
+   "shortname": "NZ1",
+   "country": "New Zealand",
+   "addr": "nz.tempus2.xyz",
+   "ipAddr": "163.47.21.18",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "RG #15 - Jump Moscow | (No rank limit) | Tempus Network",
+   "currentMap": "jump_authn_b6",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 16,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 141587508
+  },
+  "server_info": {
+   "id": 13,
+   "name": "RG #15 - No Rank Limit (Moscow)",
+   "shortname": "RU1",
+   "country": "Russia",
+   "addr": "ru.tempus2.xyz",
+   "ipAddr": "109.170.16.98",
+   "port": 27050,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "RG #16 - Jump Moscow | (Rank 500 Only) | Tempus Network",
+   "currentMap": "jump_gman_beta5_final_rebuild_rc1",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 16,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 141496572
+  },
+  "server_info": {
+   "id": 52,
+   "name": "RG #16 - Rank 500 Only (Moscow)",
+   "shortname": "RU2",
+   "country": "Russia",
+   "addr": "ru.tempus2.xyz",
+   "ipAddr": "109.170.16.98",
+   "port": 27055,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "RG #17 - Birch Grove (Novosibirsk) | (No rank limit) | Tempus Network",
+   "currentMap": "jump_mourn_a3",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 17647256
+  },
+  "server_info": {
+   "id": 79,
+   "name": "RG #17 - No Rank Limit (Novosibirsk)",
+   "shortname": "RU3",
+   "country": "Russia",
+   "addr": "novosibirsk.tempus2.xyz",
+   "ipAddr": "147.45.161.109",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "RG #18 - Cedar Silence (Novosibirsk) | (Rank 200 Only) | Tempus Network",
+   "currentMap": "jump_timtam_rc2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 17647196
+  },
+  "server_info": {
+   "id": 80,
+   "name": "RG #18 - Rank 200 Only (Novosibirsk)",
+   "shortname": "RU4",
+   "country": "Russia",
+   "addr": "novosibirsk.tempus2.xyz",
+   "ipAddr": "147.45.161.109",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "RG #19 - Jump Moscow | (No rank limit #2) | Tempus Network",
+   "currentMap": "jump_yump_final1",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "*#^&$!@",
+     "id": 517882,
+     "steamid": "STEAM_0:0:40"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 15873056
+  },
+  "server_info": {
+   "id": 81,
+   "name": "RG #19 - No Rank Limit (Moscow #2)",
+   "shortname": "RU5",
+   "country": "Russia",
+   "addr": "moscow.tempus2.xyz",
+   "ipAddr": "72.56.244.222",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "RG #20 - Jump Moscow | (No rank limit #3) | Tempus Network",
+   "currentMap": "jump_chasm_final",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "pussy destroyer",
+     "id": 170290,
+     "steamid": "STEAM_0:0:41"
+    },
+    {
+     "name": "sqrta1",
+     "id": 27679,
+     "steamid": "STEAM_0:0:42"
+    },
+    {
+     "name": "topka145",
+     "id": 153458,
+     "steamid": "STEAM_0:0:43"
+    }
+   ],
+   "playerCount": 3,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 15873908
+  },
+  "server_info": {
+   "id": 82,
+   "name": "RG #20 - No Rank Limit (Moscow #2)",
+   "shortname": "RU6",
+   "country": "Russia",
+   "addr": "moscow.tempus2.xyz",
+   "ipAddr": "72.56.244.222",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 43,
+   "name": "Scotch Dev",
+   "shortname": "SD01",
+   "country": "",
+   "addr": "",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 44,
+   "name": "jump.tf (Sweden) All Maps #1",
+   "shortname": "SE1",
+   "country": "Sweden",
+   "addr": "sweden.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 45,
+   "name": "jump.tf (Sweden) All Maps #2",
+   "shortname": "SE2",
+   "country": "Sweden",
+   "addr": "sweden.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27020,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 46,
+   "name": "jump.tf (Sweden) Rank 200 Only",
+   "shortname": "SE3",
+   "country": "Sweden",
+   "addr": "sweden.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27025,
+   "hidden": true
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "matcha Jump (Singapore) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_strikapult_v11",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "-ppppppppp",
+     "id": 355755,
+     "steamid": "STEAM_0:0:44"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 286436468
+  },
+  "server_info": {
+   "id": 4,
+   "name": "matcha (Singapore) All Maps #1",
+   "shortname": "SG1",
+   "country": "Singapore",
+   "addr": "sg.tempus2.xyz",
+   "ipAddr": "51.79.177.135",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "matcha Jump (Singapore) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_cake",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "wheat farmer",
+     "id": 35454,
+     "steamid": "STEAM_0:0:45"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 286506944
+  },
+  "server_info": {
+   "id": 7,
+   "name": "matcha (Singapore) All Maps #2",
+   "shortname": "SG2",
+   "country": "Singapore",
+   "addr": "sg.tempus2.xyz",
+   "ipAddr": "51.79.177.135",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "matcha Jump (Singapore) | All Maps #3 | Tempus Network",
+   "currentMap": "rj_rckteer_adv_v2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 286390332
+  },
+  "server_info": {
+   "id": 16,
+   "name": "matcha (Singapore) All Maps #3",
+   "shortname": "SG3",
+   "country": "Singapore",
+   "addr": "sg.tempus2.xyz",
+   "ipAddr": "51.79.177.135",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "matcha Jump (Singapore) | All Maps #4 | Tempus Network",
+   "currentMap": "jump_jasmine",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Dane Nile",
+     "id": 443286,
+     "steamid": "STEAM_0:0:46"
+    },
+    {
+     "name": ": friday",
+     "id": 16611,
+     "steamid": "STEAM_0:0:47"
+    },
+    {
+     "name": "rayyyy",
+     "id": 0,
+     "steamid": "STEAM_0:0:48"
+    }
+   ],
+   "playerCount": 3,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 286544964
+  },
+  "server_info": {
+   "id": 17,
+   "name": "matcha (Singapore) All Maps #4",
+   "shortname": "SG4",
+   "country": "Singapore",
+   "addr": "sg.tempus2.xyz",
+   "ipAddr": "51.79.177.135",
+   "port": 27045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Chicago) | All Maps | Tempus Network",
+   "currentMap": "jump_aqua",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "baz",
+     "id": 375266,
+     "steamid": "STEAM_0:0:49"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 128732020
+  },
+  "server_info": {
+   "id": 2,
+   "name": "jump.tf (Chicago) All Maps",
+   "shortname": "US1",
+   "country": "United States",
+   "addr": "chicago.tempus2.xyz",
+   "ipAddr": "74.91.124.232",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (NY) | Rank 200 Only | Tempus Network",
+   "currentMap": "jump_unclesam",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 68931800
+  },
+  "server_info": {
+   "id": 41,
+   "name": "jump.tf (New York) Rank 200 Only",
+   "shortname": "US10",
+   "country": "United States",
+   "addr": "ny.tempus2.xyz",
+   "ipAddr": "192.223.24.193",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Echo Jump (Seattle, US) | Rank 400 Only | Tempus Network",
+   "currentMap": "jump_tholos",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "Sandman",
+     "id": 325297,
+     "steamid": "STEAM_0:0:50"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 115554712
+  },
+  "server_info": {
+   "id": 48,
+   "name": "Echo Jump (Seattle) Rank 400 Only",
+   "shortname": "US11",
+   "country": "United States",
+   "addr": "seattle.tempus2.xyz",
+   "ipAddr": "74.91.117.195",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Los Angeles) | All Maps #2 | Tempus Network",
+   "currentMap": "jump_tensor_a2_zip",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 28054264
+  },
+  "server_info": {
+   "id": 49,
+   "name": "jump.tf (Los Angeles) All Maps #2",
+   "shortname": "US12",
+   "country": "United States",
+   "addr": "la.tempus2.xyz",
+   "ipAddr": "104.153.109.119",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Los Angeles) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_booyah_jmc",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 28076224
+  },
+  "server_info": {
+   "id": 50,
+   "name": "jump.tf (Los Angeles) Rank 500 Only",
+   "shortname": "US13",
+   "country": "United States",
+   "addr": "la.tempus2.xyz",
+   "ipAddr": "104.153.109.119",
+   "port": 27045,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Chicago) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_benroads3",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "evilcactus666",
+     "id": 67294,
+     "steamid": "STEAM_0:0:51"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 128764852
+  },
+  "server_info": {
+   "id": 51,
+   "name": "jump.tf (Chicago) Rank 500 Only",
+   "shortname": "US14",
+   "country": "United States",
+   "addr": "chicago.tempus2.xyz",
+   "ipAddr": "74.91.124.232",
+   "port": 27035,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Los Angeles) | All Maps #1 | Tempus Network",
+   "currentMap": "jump_camp_rc2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 27918808
+  },
+  "server_info": {
+   "id": 5,
+   "name": "jump.tf (Los Angeles) All Maps #1",
+   "shortname": "US2",
+   "country": "United States",
+   "addr": "la.tempus2.xyz",
+   "ipAddr": "104.153.109.119",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Chicago) | Beginners | Tempus Network",
+   "currentMap": "jump_mario_beta1_zip",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "trustware.incට ̫ට ;",
+     "id": 706779,
+     "steamid": "STEAM_0:0:52"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 128639476
+  },
+  "server_info": {
+   "id": 8,
+   "name": "jump.tf (Chicago) Beginners",
+   "shortname": "US3",
+   "country": "United States",
+   "addr": "chicago.tempus2.xyz",
+   "ipAddr": "74.91.124.232",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Los Angeles) | Beginner | Tempus Network",
+   "currentMap": "jump_urgent_final",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 27856436
+  },
+  "server_info": {
+   "id": 9,
+   "name": "jump.tf (Los Angeles) Beginners",
+   "shortname": "US4",
+   "country": "United States",
+   "addr": "la.tempus2.xyz",
+   "ipAddr": "104.153.109.119",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (NY) | All Maps | Tempus Network",
+   "currentMap": "jump_half",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 69241072
+  },
+  "server_info": {
+   "id": 18,
+   "name": "jump.tf (New York) All Maps",
+   "shortname": "US5",
+   "country": "United States",
+   "addr": "ny.tempus2.xyz",
+   "ipAddr": "192.223.24.193",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (NY) | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_sylvestres_rc2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 69057852
+  },
+  "server_info": {
+   "id": 19,
+   "name": "jump.tf (New York) Rank 500 Only",
+   "shortname": "US6",
+   "country": "United States",
+   "addr": "ny.tempus2.xyz",
+   "ipAddr": "192.223.24.193",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "Echo Jump (Seattle, US) | Rank 1000 Only | Tempus Network",
+   "currentMap": "jump_pants_b2",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 115529252
+  },
+  "server_info": {
+   "id": 25,
+   "name": "Echo Jump (Seattle) Rank 1000 Only",
+   "shortname": "US7",
+   "country": "United States",
+   "addr": "seattle.tempus2.xyz",
+   "ipAddr": "74.91.117.195",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Dallas) Jump | All Maps | Tempus Network",
+   "currentMap": "jump_umon_rc2",
+   "nextMap": null,
+   "users": [
+    {
+     "name": "TheGeneralScrub -jcf",
+     "id": 450935,
+     "steamid": "STEAM_0:0:53"
+    }
+   ],
+   "playerCount": 1,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 118358944
+  },
+  "server_info": {
+   "id": 39,
+   "name": "Jump (Dallas) All Maps",
+   "shortname": "US8",
+   "country": "United States",
+   "addr": "dallas.tempus2.xyz",
+   "ipAddr": "74.91.126.110",
+   "port": 27015,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": {
+   "hostname": "jump.tf (Dallas) Jump | Rank 500 Only | Tempus Network",
+   "currentMap": "jump_for_rc1",
+   "nextMap": null,
+   "users": [],
+   "playerCount": 0,
+   "maxPlayers": 24,
+   "tempusVersion": 235,
+   "spVersion": 743,
+   "gameVersion": 11117211,
+   "appID": 440,
+   "freeDisk": 118286180
+  },
+  "server_info": {
+   "id": 40,
+   "name": "Jump (Dallas) Rank 500 Only",
+   "shortname": "US9",
+   "country": "United States",
+   "addr": "dallas.tempus2.xyz",
+   "ipAddr": "74.91.126.110",
+   "port": 27025,
+   "hidden": false
+  }
+ },
+ {
+  "game_info": null,
+  "server_info": {
+   "id": 24,
+   "name": "TempusZA (All Maps)",
+   "shortname": "ZA1",
+   "country": "South Africa",
+   "addr": "za.tempus2.xyz",
+   "ipAddr": null,
+   "port": 27015,
+   "hidden": true
+  }
+ }
+]
