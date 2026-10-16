@@ -2,7 +2,7 @@
 
 A Discord bot that shows who is playing on the [Tempus](https://tempus2.xyz) TF2 rocket and sticky jump servers, worldwide.
 
-It keeps one message in your `#tempus-status` channel up to date: how many players are on how many servers, what's usual for this day and hour, and the busy servers grouped by region, each with its map, the map's soldier and demoman tiers, how long the map has been on, a Connect link and the players with their overall Tempus rank. New world records are posted in `#tempus-records`.
+It keeps one panel in your `#tempus-status` channel up to date: how many players are on how many servers, what's usual for this day and hour, and the busy servers grouped by region. Each server row shows its flag, map, soldier and demoman tiers, player count and best-ranked players, with a **Join** button. A menu under the panel opens any server's full player list privately. New world records are posted in `#tempus-records`, with whose record they beat and by how much.
 
 ## How it works
 
@@ -10,7 +10,7 @@ Tempus publishes the state of every server in one request (`/servers/statusList`
 
 Tempus asks for at most 1 request per second. The bot stays under that across everything it does, and waits as long as Tempus says when it gets a 429.
 
-Discord allows 6,000 characters per message, which isn't enough for every busy server in full. The busiest servers get a full card with their player list (up to 8 players, then "+N more"). The rest get one line each. At busy times those lines lose their Connect link, and if even that doesn't fit, the quietest servers are summed up as "+N more servers". `/servers region:Europe` shows one region with more room.
+Discord allows 40 components per message, and a server row with its Join button takes 3, so about ten servers get a row: the busiest ones. Every other busy server is listed on its region's "Also" line, and the menu covers the 25 busiest. `/servers region:Europe` shows one region with more room.
 
 ## Setup
 
@@ -58,7 +58,8 @@ python bot.py
 - **"Usually around N players":** this appears once the same weekday and hour has data from 2 earlier days, so after about a week. Time the bot is offline leaves gaps that push it back.
 - **Map times:** "started 23 minutes ago" only shows once the bot has seen the map change. After a restart it's back on the next map change.
 - **Record feed:** posts new map, course, bonus and trick world records. Set `RECORDS_INCLUDE_TOPS=true` to add top-10 map times, or leave `RECORDS_CHANNEL_NAME` empty to turn it off. Records already in the feed when the bot first starts aren't posted.
-- **Connect links:** the link page only accepts `ip:port`. A server without an IP shows the `connect` console command instead.
+- **Join buttons:** Discord only allows `http(s)` links on buttons (it rejects `steam://`), so Join opens a small page that starts TF2: `CONNECT_URL`, with `{addr}` replaced by `ip:port`. The page is in `docs/connect/`; publish it with GitHub Pages (Settings → Pages → `docs` folder) and set `CONNECT_URL=https://<user>.github.io/<repo>/connect/#{addr}`, or host it anywhere else. It only accepts a plain `ip:port`, so it can't send people anywhere else. A server without an IP gets an Info button to its Tempus page instead.
+- **WR posts:** the bot remembers each WR it sees, so a new one says whose record it beat and by how much. When it hasn't seen the old WR yet, it reads the zone's leaderboard (one request per WR) and says how far ahead of #2 the new time is.
 - **Settings:** all other options are in `.env.example`. The defaults are fine to start with.
 
 ## Security
